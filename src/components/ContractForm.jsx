@@ -38,7 +38,7 @@ const ContractForm = () => {
   return (
     <>
       <ToastContainer />
-      <div className="mx-auto max-w-[50%]">
+      <div className="mx-auto max-w-5xl">
         <h2>Contract de Prestari Servicii</h2>
         <InfoCredit />
         <Formik
@@ -106,7 +106,7 @@ const ContractForm = () => {
           }}
         >
           {({ isSubmitting, setFieldValue }) => (
-            <Form className="bg-red-500">
+            <Form>
               <div className="mt-10 gap-x-6 gap-y-8 flex flex-col">
                 {/* Form fields */}
 
@@ -115,6 +115,7 @@ const ContractForm = () => {
                 <ErrorMessage name="firstName" component="div" />
 
                 <Field name="lastName" placeholder="Last Name" />
+                <ErrorMessage name="lastName" component="div" />
 
                 <Field name="phone" placeholder="Phone" />
                 <ErrorMessage name="phone" component="div" />
@@ -136,7 +137,6 @@ const ContractForm = () => {
                     }
                   }}
                 />
-                <ErrorMessage name="photo" component="div" />
 
                 <TextCredit />
 
@@ -157,9 +157,6 @@ const ContractForm = () => {
               <button type="button" onClick={() => sigPad.current.clear()}>
                 Clear Signature
               </button>
-              {/* <button onClick={handleCheckSignature}>Check Signature</button> */}
-              {/* Display the signature image */}
-
               <ErrorMessage name="signature" component="div" />
 
               <button type="submit" disabled={isSubmitting}>
