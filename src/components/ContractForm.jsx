@@ -109,72 +109,49 @@ const ContractForm = () => {
             <Form className="bg-red-500">
               <div className="mt-10 gap-x-6 gap-y-8 flex flex-col">
                 {/* Form fields */}
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="firstName"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    First name
-                  </label>
-                  <Field
-                    name="firstName"
-                    placeholder="First Name"
-                    className=""
-                  />
 
-                  <ErrorMessage name="firstName" component="div" />
-                </div>
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="lastName"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    lastName
-                  </label>
-                  <Field name="lastName" placeholder="Last Name" />
-                  <ErrorMessage name="lastName" component="div" />
-                </div>
+                <Field name="firstName" placeholder="First Name" className="" />
 
-                <div className="sm:col-span-3">
-                  <Field name="phone" placeholder="Phone" />
-                  <ErrorMessage name="phone" component="div" />
-                </div>
-                <div className="sm:col-span-3">
-                  <Field name="email" placeholder="Email" />
-                  <ErrorMessage name="email" component="div" />
-                </div>
-                <div className="sm:col-span-3">
-                  <input
-                    id="photo"
-                    name="photo"
-                    type="file"
-                    onChange={(event) => {
-                      const file = event.currentTarget.files[0];
-                      if (file && file.size < 26214400) {
-                        // 25 MB
-                        setFieldValue("photo", file); // Set the value of the photo field
-                      } else {
-                        toast.error("File size must be less than 25MB");
-                      }
+                <ErrorMessage name="firstName" component="div" />
+
+                <Field name="lastName" placeholder="Last Name" />
+
+                <Field name="phone" placeholder="Phone" />
+                <ErrorMessage name="phone" component="div" />
+
+                <Field name="email" placeholder="Email" />
+                <ErrorMessage name="email" component="div" />
+
+                <input
+                  id="photo"
+                  name="photo"
+                  type="file"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    if (file && file.size < 26214400) {
+                      // 25 MB
+                      setFieldValue("photo", file); // Set the value of the photo field
+                    } else {
+                      toast.error("File size must be less than 25MB");
+                    }
+                  }}
+                />
+                <ErrorMessage name="photo" component="div" />
+
+                <TextCredit />
+
+                <div
+                  style={{ border: "1px solid black", marginBottom: "10px" }}
+                  className="canvas_container"
+                >
+                  <SignaturePad
+                    ref={sigPad}
+                    canvasProps={{
+                      width: 500,
+                      height: 200,
+                      className: "sigCanvas",
                     }}
                   />
-                  <ErrorMessage name="photo" component="div" />
-                </div>
-                <TextCredit />
-                <div className="sm:col-span-3">
-                  <div
-                    style={{ border: "1px solid black", marginBottom: "10px" }}
-                    className="canvas_container"
-                  >
-                    <SignaturePad
-                      ref={sigPad}
-                      canvasProps={{
-                        width: 500,
-                        height: 200,
-                        className: "sigCanvas",
-                      }}
-                    />
-                  </div>
                 </div>
               </div>
               <button type="button" onClick={() => sigPad.current.clear()}>
