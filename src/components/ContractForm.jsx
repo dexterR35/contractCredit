@@ -38,8 +38,10 @@ const ContractForm = () => {
   return (
     <>
       <ToastContainer />
-      <div className="mx-auto max-w-5xl">
-        <h2>Contract de Prestari Servicii</h2>
+      <div className="mx-auto max-w-3xl p-4">
+        <h2 className="text-[24px] sm:text-2xl font-bold text-center my-10">
+          Contract de Prestari Servicii
+        </h2>
         <InfoCredit />
         <Formik
           initialValues={{
@@ -107,37 +109,62 @@ const ContractForm = () => {
         >
           {({ isSubmitting, setFieldValue }) => (
             <Form>
-              <div className="mt-10 gap-x-6 gap-y-8 flex flex-col">
+              <div className="mt-10 gap-x-6 gap-y-2 flex flex-col">
                 {/* Form fields */}
-
-                <Field name="firstName" placeholder="First Name" className="" />
-
-                <ErrorMessage name="firstName" component="div" />
-
-                <Field name="lastName" placeholder="Last Name" />
-                <ErrorMessage name="lastName" component="div" />
-
-                <Field name="phone" placeholder="Phone" />
-                <ErrorMessage name="phone" component="div" />
-
-                <Field name="email" placeholder="Email" />
-                <ErrorMessage name="email" component="div" />
-
-                <input
-                  id="photo"
-                  name="photo"
-                  type="file"
-                  onChange={(event) => {
-                    const file = event.currentTarget.files[0];
-                    if (file && file.size < 26214400) {
-                      // 25 MB
-                      setFieldValue("photo", file); // Set the value of the photo field
-                    } else {
-                      toast.error("File size must be less than 25MB");
-                    }
-                  }}
-                />
-
+                <div className="mx-auto w-[95%]">
+                  <div className="mb-2">
+                    <label htmlFor="firstName">
+                      Nume <span>*</span>
+                    </label>
+                    <Field name="firstName" className="" />
+                    <ErrorMessage
+                      name="firstName"
+                      component="div"
+                      className="text-red-500 text-md"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor="lastName">Prenume</label>
+                    <Field name="lastName" />
+                    <ErrorMessage
+                      name="lastName"
+                      component="div"
+                      className="text-red-500 text-md"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor="phone">Telefon</label>
+                    <Field name="phone" />
+                    <ErrorMessage
+                      name="phone"
+                      component="div"
+                      className="text-red-500 text-md"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label htmlFor="email">Email</label>
+                    <Field name="email" />
+                    <ErrorMessage
+                      name="email"
+                      component="div"
+                      className="text-red-500 text-md"
+                    />
+                  </div>
+                  <input
+                    id="photo"
+                    name="photo"
+                    type="file"
+                    onChange={(event) => {
+                      const file = event.currentTarget.files[0];
+                      if (file && file.size < 26214400) {
+                        // 25 MB
+                        setFieldValue("photo", file); // Set the value of the photo field
+                      } else {
+                        toast.error("File size must be less than 25MB");
+                      }
+                    }}
+                  />
+                </div>
                 <TextCredit />
 
                 <div
@@ -147,7 +174,7 @@ const ContractForm = () => {
                   <SignaturePad
                     ref={sigPad}
                     canvasProps={{
-                      width: 500,
+                      width: 300,
                       height: 200,
                       className: "sigCanvas",
                     }}
@@ -155,13 +182,14 @@ const ContractForm = () => {
                 </div>
               </div>
               <button type="button" onClick={() => sigPad.current.clear()}>
-                Clear Signature
+                Elimina Semnatura
               </button>
-              <ErrorMessage name="signature" component="div" />
 
-              <button type="submit" disabled={isSubmitting}>
-                Submit
-              </button>
+              <div className="container-buttons flex gap-3">
+                <button type="submit" disabled={isSubmitting}>
+                  Trimite Contractul
+                </button>
+              </div>
             </Form>
           )}
         </Formik>

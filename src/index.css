@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+body,
+html {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+}
 form {
   display: flex;
   flex-direction: column;
@@ -13,4 +18,40 @@ form {
 canvas {
   width: 100%;
   height: 100% !important;
+}
+form ul li {
+  margin: 8px 0;
+}
+form ul p {
+  margin: 1rem 0;
+}
+
+button:not([type="button"]) {
+  color: white;
+  background-color: red !important;
+  padding: 0.5em 1em;
+  width: 33%;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 1.1em;
+  border-radius: 7px;
+}
+
+button[type="button"] {
+  background: gray;
+  color: white;
+  padding: 0.4em;
+}
+
+label {
+  @apply block text-lg text-gray-900;
+}
+input:nth-child(5) {
+  @apply border-0 p-0;
+}
+input {
+  @apply my-2 w-full border border-gray-300 py-2 px-4 rounded;
+}
+ErrorMessage {
+  @apply text-red-500 text-xs italic;
 }
