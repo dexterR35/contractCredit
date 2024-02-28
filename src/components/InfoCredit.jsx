@@ -4,7 +4,6 @@ const InfoCredit = () => {
   return (
     <>
       <div>PARTILE CONTRACTANTE</div>
-
       <div>
         SOCIETATEA <b>OBTINECREDIT.RO SRL</b>, cu sediul social în Bucureşti,
         SECTOR 1, Str. Hrisovului Nr. 5A, CAMERA 1, Bloc. 2, Scara 1, Etaj 4,
