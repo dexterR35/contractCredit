@@ -1,6 +1,6 @@
 import React from "react";
 
-const TextCredit = () => {
+const TextCredit = ({ textContent }) => {
   return (
     <div>
       <ul>
