@@ -9,7 +9,7 @@ import TextCredit from "./TextCredit";
 
 const ContractForm = () => {
   const sigPad = useRef(null);
-
+  const [selectedFileName, setSelectedFileName] = useState("");
   const validateForm = (values) => {
     const errors = {};
     if (!values.firstName) {
@@ -109,9 +109,10 @@ const ContractForm = () => {
         >
           {({ isSubmitting, setFieldValue }) => (
             <Form>
+              <>
               <div className="mt-10 gap-x-6 gap-y-2 flex flex-col">
                 {/* Form fields */}
-                <div className="mx-auto w-[95%]">
+                <div className="mx-auto w-full">
                   <div className="mb-2">
                     <label htmlFor="firstName">
                       Nume <span>*</span>
@@ -124,7 +125,7 @@ const ContractForm = () => {
                     />
                   </div>
                   <div className="mb-2">
-                    <label htmlFor="lastName">Prenume</label>
+                    <label htmlFor="lastName">Prenume <span>*</span></label>
                     <Field name="lastName" />
                     <ErrorMessage
                       name="lastName"
@@ -133,7 +134,7 @@ const ContractForm = () => {
                     />
                   </div>
                   <div className="mb-2">
-                    <label htmlFor="phone">Telefon</label>
+                    <label htmlFor="phone">Telefon <span>*</span></label>
                     <Field name="phone" />
                     <ErrorMessage
                       name="phone"
@@ -142,7 +143,7 @@ const ContractForm = () => {
                     />
                   </div>
                   <div className="mb-2">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Email <span>*</span></label>
                     <Field name="email" />
                     <ErrorMessage
                       name="email"
@@ -150,47 +151,68 @@ const ContractForm = () => {
                       className="text-red-500 text-md"
                     />
                   </div>
-                  <input
-                    id="photo"
-                    name="photo"
-                    type="file"
-                    onChange={(event) => {
-                      const file = event.currentTarget.files[0];
-                      if (file && file.size < 26214400) {
-                        // 25 MB
-                        setFieldValue("photo", file); // Set the value of the photo field
-                      } else {
-                        toast.error("File size must be less than 25MB");
-                      }
-                    }}
-                  />
+                  <div className="mb-2">
+                    <div className="flex items-start justify-start w-full flex-col mb-2">
+                      <label className="mb-2" htmlFor="photo">Carte Identitate <span>*</span></label>
+                      <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-green-300 border-dashed rounded-lg cursor-pointer bg-green-50">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <p>icon</p>
+                          <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Apasa pentru</span> or drag and drop</p>
+                          <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                          <p className="text-xs text-gray-500">File size must be less than 12MB</p>
+                          {selectedFileName && <p className="text-xs text-gray-500">Selected File: {selectedFileName}</p>} {/* Display the selected file name */}
+                        </div>
+
+                        <input
+                          id="photo"
+                          name="photo"
+                          type="file"
+                          className="hidden"
+                          onChange={(event) => {
+                            const file = event.currentTarget.files[0];
+                            if (file && file.size < 26214400) {
+                              // 25 MB
+                              setSelectedFileName(file.name); // Set the selected file name
+                              setFieldValue("photo", file); // Set the value of the photo field
+                            } else {
+                              setSelectedFileName("");
+                              toast.error("File size must be less than 25MB");
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </div>
                 <TextCredit />
+                <div className="mb-4">
+                  <label className="mb-2" htmlFor="lastName">Semnatura Clientului <span>*</span></label>
+                  <div className="canvas_container border border-1 border-black ">
 
-                <div
-                  style={{ border: "1px solid black", marginBottom: "10px" }}
-                  className="canvas_container"
-                >
-                  <SignaturePad
-                    ref={sigPad}
-                    canvasProps={{
-                      width: 300,
-                      height: 200,
-                      className: "sigCanvas",
-                    }}
-                  />
+                    <SignaturePad
+                      ref={sigPad}
+                      canvasProps={{
+
+                        className: "sigCanvas",
+                      }}
+                    />
+
+                  </div>
+                  {/* <button className="bg-tranparent p-0" type="button" onClick={() => sigPad.current.clear()}>
+                    Reseteaza
+                  </button> */}
                 </div>
-              </div>
-              <button type="button" onClick={() => sigPad.current.clear()}>
-                Elimina Semnatura
-              </button>
 
-              <div className="container-buttons flex gap-3">
+              </div>
+
+              <div className="container-buttons flex gap-3 mx-auto">
                 <button type="submit" disabled={isSubmitting}>
                   Trimite Contractul
                 </button>
               </div>
+              </>
             </Form>
+            
           )}
         </Formik>
       </div>

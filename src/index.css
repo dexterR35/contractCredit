@@ -14,6 +14,7 @@ form {
 .canvas_container {
   width: 300px !important;
   height: 200px;
+
 }
 canvas {
   width: 100%;
@@ -30,7 +31,7 @@ button:not([type="button"]) {
   color: white;
   background-color: red !important;
   padding: 0.5em 1em;
-  width: 33%;
+  width: fit-content;
   text-transform: uppercase;
   font-weight: 700;
   font-size: 1.1em;
@@ -54,4 +55,9 @@ input {
 }
 ErrorMessage {
   @apply text-red-500 text-xs italic;
+}
+
+
+label span {
+  @apply text-green-600;
 }
