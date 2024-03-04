@@ -1,40 +1,44 @@
 
-import React from 'react';
+
+
 import emailjs from 'emailjs-com';
 import { toast } from 'react-toastify';
 
-const EmailSender = ({ formValues, signatureDataUrl }) => {
+export const sendEmail = async (formValues, pdfBlob) => {
+  if (!formValues.email) {
+    toast.error("Email address is required.");
+    return;
+  }
 
-  const sendEmail = async () => {
-    if (!formValues.email) { // Ensure there is an email to send to
-      toast.error("Email address is required.");
-      return;
-    }
+  try {
+    const templateParams = {
+      from_name: "ObtineCredit.ro",
+      to_name: `${formValues.firstName} ${formValues.lastName}`,
+      reply_to: formValues.email,
+    };
 
-    try {
-      const templateParams = {
-        from_name: `${formValues.firstName} ${formValues.lastName}`,
-        to_name: "Recipient Name", // Replace with recipient's name if available or use a static name
-        message_html: "Here you can include additional text or form values",
-        reply_to: formValues.email,
-        signature_image: signatureDataUrl, // Make sure this is a URL or a base64 string if supported
-      };
+    const serviceId = 'service_66zfxbl'; // Update with your EmailJS service ID
+    const templateId = 'template_28hl07u'; // Update with your EmailJS template ID
+    const userId = '0LuwZPt-8aGtf94ka'
+    const attachment = new Blob([pdfBlob], { type: 'application/pdf' });
+    const attachmentName = 'document.pdf';
 
-      // Replace 'service_66zfxbl', 'template_28hl07u', and '0LuwZPt-8aGtf94ka' with your actual EmailJS details
-      await emailjs.send('service_66zfxbl', 'template_28hl07u', templateParams, '0LuwZPt-8aGtf94ka');
-      toast.success("Email sent successfully!");
+    const emailParams = {
+      ...templateParams,
+      ...{
+        message_html: `
+          <p>Nume: ${formValues.firstName}</p>
+          <p>Prenume: ${formValues.lastName}</p>
+          <p>Telefon: ${formValues.phone}</p>
+          <p>Email: ${formValues.email}</p>
+        `
+      }
+    };
 
-    } catch (error) {
-      console.error("Error sending email: ", error);
-      toast.error("Error sending email");
-
-      
-    }
-  };
-
-  return (
-    <button onClick={sendEmail}>Send Email</button>
-  );
+    await emailjs.send(serviceId, templateId, emailParams, { attachment, name: attachmentName }, userId);
+    toast.success("Email sent successfully!");
+  } catch (error) {
+    console.error("Error sending email: ", error);
+    toast.error("Error sending email");
+  }
 };
-
-export default EmailSender;

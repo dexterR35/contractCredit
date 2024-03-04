@@ -12,8 +12,8 @@ form {
   flex-direction: column;
 }
 .canvas_container {
-  width: 300px !important;
-  height: 200px;
+  width: 210px !important;
+  height: 110px;
 
 }
 canvas {
@@ -29,7 +29,7 @@ form ul p {
 
 button:not([type="button"]) {
   color: white;
-  background-color: red !important;
+  background-color: green !important;
   padding: 0.5em 1em;
   width: fit-content;
   text-transform: uppercase;
@@ -53,11 +53,16 @@ input:nth-child(5) {
 input {
   @apply my-2 w-full border border-gray-300 py-2 px-4 rounded;
 }
-ErrorMessage {
-  @apply text-red-500 text-xs italic;
+.s label {
+  @apply flex flex-row justify-between;
 }
 
 
 label span {
   @apply text-green-600;
+}
+
+
+.error {
+  @apply text-red-500;
 }
