@@ -5,9 +5,12 @@ function App() {
   
   return (
     <>
-      <MyForm />
+    <div className="bg-green-200">
+      <MyForm className="bg-white"/>
       {/* <DisplayData /> */}
 
+      <PdfGenerator  />
+      </div>
     </>
   );
 }

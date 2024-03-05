@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
+import "react-toastify/dist/ReactToastify.css";
+import { FcAddImage } from "react-icons/fc";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { uploadFile, saveFormData } from "../services/FirebaseServices";
 import SignaturePad from "react-signature-canvas";
 import InfoCredit from "./InfoCredit";
@@ -11,7 +12,8 @@ const ContractForm = () => {
 
   const sigPad = useRef(null);
   const [selectedFileName, setSelectedFileName] = useState("");
-
+  const [checkboxState, setCheckboxState] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const currentDate = () => {
     const currentDate = new Date();
@@ -22,12 +24,12 @@ const ContractForm = () => {
   };
   const validateForm = (values) => {
     const errors = {};
+
     if (!values.firstName) {
       errors.firstName = "Introdu Numele";
     }
     if (!values.lastName) {
       errors.lastName = "Last name is required";
-
     }
     if (!values.phone) {
       errors.phone = "Phone is required";
@@ -51,9 +53,14 @@ const ContractForm = () => {
         errors.photo = "File size must be less than 12MB";
       }
     }
+
     return errors;
   };
+  const checkFormFields = (values) => {
 
+    const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'photo'];
+    return requiredFields.every(field => values[field]);
+  };
   return (
     <>
       <ToastContainer
@@ -70,7 +77,7 @@ const ContractForm = () => {
         theme="light"
         transition:Bounce
       />
-      <div className="mx-auto max-w-3xl p-4">
+      <div className="mx-auto max-w-3xl sm:p-8 p-3 bg-white">
         <h2 className="text-[24px] sm:text-2xl font-bold text-center my-10">
           Contract de Prestari Servicii
         </h2>
@@ -107,7 +114,6 @@ const ContractForm = () => {
               if (values.photo) {
                 photoUrl = await uploadFile(values.photo, `contracts`);
               }
-
               // Prepare and upload the signature if present
               if (sigPad.current && !sigPad.current.isEmpty()) {
                 const signatureBlob = await new Promise((resolve) =>
@@ -123,10 +129,11 @@ const ContractForm = () => {
                   );
                 }
               }
-
               formData.photoUrl = photoUrl;
               formData.signatureUrl = signatureUrl;
+
               await saveFormData(formData);
+              
               toast.success("Form submitted successfully!");
               resetForm();
               sigPad.current.clear();
@@ -140,11 +147,8 @@ const ContractForm = () => {
           }}
         >
           {({ isSubmitting, setFieldValue, values }) => (
-
             <Form className="select-none">
-
               <>
-
                 <div className="mt-10 gap-x-6 gap-y-2 flex flex-col">
                   {/* Form fields */}
                   <div className="mx-auto w-full">
@@ -201,60 +205,69 @@ const ContractForm = () => {
 
                       <label htmlFor="photo" className="flex flex-col items-center justify-center w-full h-64 border-2 border-green-300 border-dashed rounded-lg cursor-pointer bg-green-50">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <p>icon</p>
-                          <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Apasa pentru</span> or drag and drop</p>
-                          <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                          <p className="text-xs text-gray-500">File size must be less than 12MB</p>
-                          {selectedFileName && <p className="text-xs text-gray-500">Selected File: {selectedFileName}</p>} {/* Display the selected file name */}
+                          <p><FcAddImage size={50}/></p>
+                          <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Apasă pentru</span> a insera o imagine</p>
+                          <p className="text-xs text-gray-500">-</p>
+                          <p className="text-xs text-gray-500">PNG, JPG, JPEG, WEBP </p>
+                          <p className="text-xs text-gray-500 mb-2">Fisierul trebuie să contină maxim 12MB</p>
+                       
                         </div>
-
+                        {selectedFileName && <p className="text-sm text-gray-800">Fisierul Selectat: {selectedFileName}</p>} 
                         <input
                           id="photo"
                           name="photo"
-                          accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+                          accept="image/png, image/jpg, image/jpeg, image/webp"
                           type="file"
                           className="hidden"
                           onChange={(event) => {
                             const file = event.currentTarget.files[0];
                             if (file) {
-                              // Check if the file is one of the allowed types
-                              if (["image/png", "image/jpg", "image/jpeg", "image/gif", "image/webp"].includes(file.type)) {
+                         
+                              if (["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(file.type)) {
                                 if (file.size < 12582912) { // 12 MB
-                                  setSelectedFileName(file.name); // Set the selected file name
-                                  setFieldValue("photo", file); // Set the value of the photo field
+                                  setSelectedFileName(file.name); 
+                                  setFieldValue("photo", file); 
                                 } else {
                                   setSelectedFileName("");
                                   toast.error("File size must be less than 12MB");
                                 }
                               } else {
                                 setSelectedFileName("");
-                                toast.error("Invalid file type. Only PNG, JPG, GIF, and WEBP are allowed.");
+                                toast.error("Invalid file type. Only PNG, JPG, and WEBP are allowed.");
                               }
                             }
                           }}
                         />
                       </label>
 
-
-
                     </div>
                   </div>
+                  {/*  add text*/}
                   <TextCredit />
-                  <div className="mb-4 flex flex-row-reverse justify-between">
-                    <div className="mt-12">
-                      <label className="mb-2" htmlFor="lastName">Semnatura Clientului <span>*</span></label>
-                      <div className="canvas_container border border-1 border-gray-200">
 
+                  <div className="my-2">
+                    <div className="flex flex-row space-x-5 sm:w-[80%] w-full">
+                      <Field className="w-[25px]" type="checkbox" name="checkbox" checked={checkboxState} onChange={e => {
+                        setCheckboxState(e.target.checked);
+                        setIsFormValid(e.target.checked && checkFormFields(values));
+                      }} />
+                      <span className="text-gray-700 sm:text-sm text-sm">Sunt de acord cu procesarea datelor mele conform "Politica de Confidențialitate" și "Termeni și Condiții"</span>
+                    </div>
+                    {!isFormValid && checkboxState && <div className="error text-center">completează toate campurile</div>}
+                  </div>
+                  <div className="mb-4 flex sm:flex-row-reverse flex-col-reverse justify-around">
+                    <div className="mt-4">
+                      <label className="mb-2" htmlFor="lastName">Semnatură client<span>*</span></label>
+                      <div className="canvas_container border border-1 border-gray-200">
                         <SignaturePad
                           ref={sigPad}
                           canvasProps={{
                             className: "sigCanvas",
                           }}
                         />
-
                       </div>
                       <a className="bg-tranparent my-1 cursor-pointer" type="button" onClick={() => sigPad.current.clear()}>
-                        Reseteaza
+                        Resetează
                       </a>
                     </div>
                     <div className="flex flex-col mt-12">
@@ -262,19 +275,15 @@ const ContractForm = () => {
                       <p className="text-lg"><span className="text-[16px]">Data:</span> {currentDate()}</p>
                     </div>
                   </div>
-
-
-
                 </div>
 
-                <div className="container-buttons flex gap-3 mx-auto">
-                  <button type="submit" disabled={isSubmitting}>
+                <div className="container-buttons flex gap-3 mx-auto my-8">
+                  <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`}>
                     Trimite Contractul
                   </button>
                 </div>
               </>
             </Form>
-
           )}
         </Formik>
       </div>

@@ -11,6 +11,7 @@ form {
   display: flex;
   flex-direction: column;
 }
+
 .canvas_container {
   width: 210px !important;
   height: 110px;
@@ -29,7 +30,6 @@ form ul p {
 
 button:not([type="button"]) {
   color: white;
-  background-color: green !important;
   padding: 0.5em 1em;
   width: fit-content;
   text-transform: uppercase;
