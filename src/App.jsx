@@ -7,7 +7,7 @@ function App() {
     <>
     <div className="bg-green-200">
       <MyForm className="bg-white"/>
-      {/* <DisplayData /> */}
+      <DisplayData />
 
       <PdfGenerator  />
       </div>

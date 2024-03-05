@@ -7,8 +7,6 @@ const TextCredit = () => {
         <p>
           <b>ART. 1. OBIECTUL CONTRACTULUI </b>
         </p>
-     
-
         <li>
           (1) În scopul realizării obiectului Contractului, Prestatorul își
           asumă următoarele obligații:

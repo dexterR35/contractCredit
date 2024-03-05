@@ -1,5 +1,11 @@
 export const contractSections = [
     {
+        title: "",
+        items: [
+            "SOCIETATEA OBTINECREDIT.RO SRL, cu sediul social în Bucureşti, SECTOR 1, Str. Hrisovului Nr. 5A, CAMERA 1, Bloc. 2, Scara 1, Etaj 4, nr. telefon 0786.744.694, înregistrată în Registrul Comerţului sub nr. J40/11953/2023, și CIF 48406675, Cont RO85RNCB0082175670920001 deschis la Banca Comerciala Roaman S.A., reprezentată legal de către Dl. Hodor Florin, în calitate de consultant financiar."
+        ]
+    },
+    {
         title: "ART. 1. OBIECTUL CONTRACTULUI",
         items: [
             "Prestatorul se obligă să presteze servicii de specialitate Clientului, ce constau în analizarea dosarului acestuia, prospectarea pieței, identificarea celei mai avantajoase soluții de creditare pentru Client, servicii în vederea alegerii produsului de creditare optim pentru Client, consiliere în vederea întocmirii dosarului de credit, inclusiv colectarea documentelor necesare, indrumarea Clientului la instituțiile financiar-bancare și punerea acestuia în legătură cu consultanții financiar-bancari, în schimbul remunerației prevăzute la art. 3 alin. (1)."
@@ -33,5 +39,5 @@ export const contractSections = [
             "(c) Să garanteze solvabilitatea Clientului sau a finanțatorului."
         ]
     },
-    // Add more sections as needed
+   
 ];

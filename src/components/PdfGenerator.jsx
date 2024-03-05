@@ -4,10 +4,13 @@ import { contractSections } from './TextObject';
 import { Font } from '@react-pdf/renderer';
 import CustomFont from '../fonts/Roboto-Regular.ttf';
 
+
 Font.register({
     family: 'Roboto',
-    src: CustomFont, // Adjust the path as necessary
+    src: CustomFont, 
   });
+
+  
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -31,11 +34,9 @@ const styles = StyleSheet.create({
   },
 });
 
-// Define MyDocument component
+
 const MyDocument = () => {
-  // Check if contractSections is defined
   if (!contractSections) return null;
-  
   // Flatten all sections into a single array of elements
   const contentElements = contractSections.flatMap(section => [
     <Text key={section.title} style={styles.title}>{section.title}</Text>,
@@ -44,11 +45,11 @@ const MyDocument = () => {
     )),
   ]);
   
-  // Render Document with content
   return (
     <Document>
       <Page style={styles.page}>
         <View style={styles.section}>
+        <Text style={styles.text}>Contract de Prestari Servicii</Text>
           {contentElements}
         </View>
       </Page>
