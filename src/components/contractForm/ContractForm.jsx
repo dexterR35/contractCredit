@@ -10,14 +10,14 @@ import { currentDate, validateForm, checkFormFields } from "../contractForm/Vali
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
 import MyDocument from "../PdfGenerator";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink,PDFViewer } from "@react-pdf/renderer";
 const ContractForm = () => {
 
   const sigPad = useRef(null);
  /* check state */
   const [checkboxState, setCheckboxState] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
-
+  const [showPdf, setShowPdf] = useState(false); 
    /* global */
   const {
     formData, setFormData, selectedFileName, setSelectedFileName
@@ -81,12 +81,12 @@ const ContractForm = () => {
                     sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
                   );
                   // console.log("Signature blob:", signatureBlob);
-                  const signatureData = sigPad.current.toDataURL("image/png");
-                  console.log("Signature data:", signatureData);
+                  // const signatureData = sigPad.current.toDataURL("image/png");
+              
                   if (signatureBlob) {
                     signatureUrl = await uploadFile(signatureBlob, 'contracts');
                     console.log("signatureUrl:", signatureUrl);
-                    values.signature = signatureData;
+                    values.signature = signatureUrl;
               
                   }
                 } catch (error) {
@@ -103,11 +103,11 @@ const ContractForm = () => {
                 return;
               }
                // update formdata to global 
-              const updatedFormData = { ...values,signatureUrl };
+              const updatedFormData = { ...values };
               setFormData(updatedFormData);
                // save formdata to db 
               await saveFormData(updatedFormData);
-          
+              setShowPdf(true);
             } catch (error) {
               console.error("Error submitting form: ", error);
               toast.error("Error submitting form");
@@ -268,6 +268,11 @@ const ContractForm = () => {
           )}
         </Formik>
       </div>
+      {showPdf && (
+        <div>
+            <MyDocument />
+        </div>
+      )}
     </>
   );
 };

@@ -3,7 +3,7 @@ import DisplayData from "./components/DisplayData";
 
 import ContractForm from './components/contractForm/ContractForm'
 import { FormDataProvider } from './context/FormDataContext'; 
-import PdfGenerator from "./components/PdfGenerator";
+
 function App() {
   
   return (
@@ -13,7 +13,7 @@ function App() {
    
       <ContractForm />
       {/* <DisplayData /> */}
-      <PdfGenerator  />
+  
    
       </div>
     
