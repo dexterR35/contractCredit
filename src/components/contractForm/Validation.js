@@ -6,7 +6,7 @@ export const currentDate = () => {
     return `${day}.${month}.${year}`;
 };
 
-export const validateForm = (values) => {
+export const validateForm = (values,sigPad) => {
     const errors = {};
 
     if (!values.firstName) {
@@ -37,12 +37,19 @@ export const validateForm = (values) => {
             errors.photo = "File size must be less than 12MB";
         }
     }
+    if (!sigPad || (sigPad.current && sigPad.current.isEmpty())) {
+        errors.signature = "Signature is required";
+    }
 
     return errors;
 };
 
 
-export const checkFormFields = (values) => {
+export const checkFormFields = (values, sigPad) => {
     const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'photo'];
-    return requiredFields.every(field => values[field]);
+    const allFieldsFilled = requiredFields.every(field => values[field]);
+
+    // Check if the signature is filled
+    const isSignatureFilled = sigPad.current && !sigPad.current.isEmpty();
+    return allFieldsFilled && isSignatureFilled;
 };

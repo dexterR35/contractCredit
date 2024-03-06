@@ -10,7 +10,7 @@ export const FormDataProvider = ({ children }) => {
     lastName: "",
     phone: "",
     email: "",
-    photo: null,
+    photo: "",
     signature: "",
   });
   const [selectedFileName, setSelectedFileName] = useState("");

@@ -1,26 +1,28 @@
 import React, { useState, useRef } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { FcAddImage } from "react-icons/fc";
+import SignaturePad from "react-signature-canvas";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import { uploadFile, saveFormData } from "../../services/FirebaseServices";
-import SignaturePad from "react-signature-canvas";
 import { useFormData } from "../../context/FormDataContext";
-import { currentDate, validateForm,checkFormFields } from "../contractForm/FormUtils";
+import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
-
-
-const ContractForm = () => {  
+import MyDocument from "../PdfGenerator";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+const ContractForm = () => {
 
   const sigPad = useRef(null);
+ /* check state */
   const [checkboxState, setCheckboxState] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
 
+   /* global */
   const {
     formData, setFormData, selectedFileName, setSelectedFileName
   } = useFormData();
-  
+
   return (
     <>
       <ToastContainer
@@ -51,16 +53,16 @@ const ContractForm = () => {
             photo: null,
             signature: null,
           }}
-          validate={validateForm}
+          validate={(values) => validateForm(values, sigPad)}   // validation comp
+           // when i press the button 
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             try {
+
               let photoUrl = "";
               let signatureUrl = "";
 
               setSubmitting(true);
-
-           
-
+            //add photo to storage and errors
               if (values.photo) {
                 try {
                   photoUrl = await uploadFile(values.photo, `contracts`);
@@ -72,21 +74,20 @@ const ContractForm = () => {
                   return;
                 }
               }
-              if (sigPad.current && sigPad.current.isEmpty()) {
-                toast.error("Signature is required");
-                setSubmitting(false);
-                return;
-              }
+                   // not empty resolve blop to png and add to storage and errors
               if (sigPad.current && !sigPad.current.isEmpty()) {
                 try {
                   const signatureBlob = await new Promise((resolve) =>
                     sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
                   );
-                  // const signatureData = sigPad.current.toDataURL("image/png");
-                  // console.log("Signature data:", signatureData);
+                  // console.log("Signature blob:", signatureBlob);
+                  const signatureData = sigPad.current.toDataURL("image/png");
+                  console.log("Signature data:", signatureData);
                   if (signatureBlob) {
                     signatureUrl = await uploadFile(signatureBlob, 'contracts');
-                    values.signature = signatureUrl;
+                    console.log("signatureUrl:", signatureUrl);
+                    values.signature = signatureData;
+              
                   }
                 } catch (error) {
                   console.error("Error uploading signature: ", error);
@@ -95,23 +96,27 @@ const ContractForm = () => {
                   return;
                 }
               }
-              const documentData = {
-                ...values
-      
-       
-              };
-              setFormData(documentData);
-              console.log(setFormData, "setFormData")
-              delete documentData.photo;
-              await saveFormData(documentData);
-              toast.success("Form submitted successfully!");
-              resetForm();
-              sigPad.current.clear();
+               // check signature canvas
+               if (sigPad.current && sigPad.current.isEmpty()) {
+                toast.error("Signature is required");
+                setSubmitting(false);
+                return;
+              }
+               // update formdata to global 
+              const updatedFormData = { ...values,signatureUrl };
+              setFormData(updatedFormData);
+               // save formdata to db 
+              await saveFormData(updatedFormData);
+          
             } catch (error) {
               console.error("Error submitting form: ", error);
               toast.error("Error submitting form");
             } finally {
               setSubmitting(false);
+              toast.success("Form submitted successfully!");
+               // reset
+               resetForm();
+              sigPad.current.clear();
             }
           }}
         >
@@ -182,51 +187,55 @@ const ContractForm = () => {
 
                         </div>
                         {selectedFileName && <p className="text-sm text-gray-800">Fisierul Selectat: {selectedFileName}</p>}
-                        <input
+                       
+                        <Field   // This is the hidden input field for file upload, if i use formik <field we need value to be undifined and empty string for photo ,if i use <input> tag works fine witout unfined and empty string
                           id="photo"
                           name="photo"
-                          accept="image/png, image/jpg, image/jpeg, image/webp"
                           type="file"
+                          accept="image/png, image/jpg, image/jpeg, image/webp"
                           className="hidden"
                           onChange={(event) => {
                             const file = event.currentTarget.files[0];
                             if (file) {
-
                               if (["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(file.type)) {
-                                if (file.size < 12582912) { // 12 MB
+                                if (file.size <= 12582912) { // max 12 MB
                                   setSelectedFileName(file.name);
                                   setFieldValue("photo", file);
                                 } else {
                                   setSelectedFileName("");
-                                  toast.error("File size must be less than 12MB");
+                                  toast.error("Fisierul trebuie sa contina maxim 12MB");
                                 }
                               } else {
                                 setSelectedFileName("");
-                                toast.error("Invalid file type. Only PNG, JPG, and WEBP are allowed.");
+                                toast.error("Fisier invalid. extensia PNG, JPG, and WEBP este obligatorie.");
                               }
+                            } else {
+                              setFieldValue("photo", ""); // Set an empty string if no file is selected
                             }
                           }}
+                          value={undefined} // Set value to undefined to avoid the warning
                         />
                       </label>
 
                     </div>
                   </div>
-                  {/*  add text*/}
+                  {/*  Text from object*/}
                   <TextCredit />
-
                   <div className="my-2">
                     <div className="flex flex-row space-x-5 sm:w-[80%] w-full">
                       <Field className="w-[25px]" type="checkbox" name="checkbox" checked={checkboxState} onChange={e => {
                         setCheckboxState(e.target.checked);
-                        setIsFormValid(e.target.checked && checkFormFields(values));
+                        setIsFormValid(e.target.checked && checkFormFields(values, sigPad));
                       }} />
-                      <span className="text-gray-700 sm:text-sm text-sm">Sunt de acord cu procesarea datelor mele conform "Politica de Confidențialitate" și "Termeni și Condiții"</span>
+                      <span className="text-gray-700 sm:text-sm text-sm">Sunt de acord cu procesarea datelor mele conform 'Politica de Confidențialitate' și 'Termeni și Condiții'</span>
                     </div>
+                      {/* error when check */}
                     {!isFormValid && checkboxState && <div className="error text-center">completează toate campurile</div>}
                   </div>
+                    {/* signature */}
                   <div className="mb-4 flex sm:flex-row-reverse flex-col-reverse justify-around">
                     <div className="mt-4">
-                      <label className="mb-2" htmlFor="lastName">Semnatură client<span>*</span></label>
+                      <label className="mb-2" htmlFor="signature">Semnatură client<span>*</span></label>
                       <div className="canvas_container border border-1 border-gray-200">
                         <SignaturePad
                           ref={sigPad}
@@ -239,20 +248,22 @@ const ContractForm = () => {
                         Resetează
                       </a>
                     </div>
+                       {/* date and name */}
                     <div className="flex flex-col mt-12">
-                      <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {values.firstName || values.lastName ? `${values.firstName} ${values.lastName}` : " Marian Iordache "}</p>
+                      <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {formData.firstName || formData.lastName ? `${values.firstName} ${values.lastName}` : " Marian Iordache "}</p>
                       <p className="text-lg"><span className="text-[16px]">Data:</span> {currentDate()}</p>
                     </div>
                   </div>
                 </div>
-
+                {/* button disabled when is not value or signature or photo */}
                 <div className="container-buttons flex gap-3 mx-auto my-8">
                   <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`}>
                     Trimite Contractul
                   </button>
-                </div>
-              </>
     
+                </div>
+           
+              </>
             </Form>
           )}
         </Formik>
