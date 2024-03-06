@@ -28,16 +28,16 @@ const DisplayData = () => {
           </h2>
           <p>Phone: {contract.phone}</p>
           <p>Email: {contract.email}</p>
-          {contract.photoUrl && (
+          {contract.photo && (
             <img
-              src={contract.photoUrl}
+              src={contract.photo}
               alt="Uploaded"
               style={{ width: "100px", height: "100px" }}
             />
           )}
-          {contract.signatureUrl && (
+          {contract.signature && (
             <img
-              src={contract.signatureUrl}
+              src={contract.signature}
               alt="Signature"
               style={{ width: "200px", height: "100px" }}
             />

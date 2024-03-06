@@ -3,64 +3,24 @@ import "react-toastify/dist/ReactToastify.css";
 import { FcAddImage } from "react-icons/fc";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
-import { uploadFile, saveFormData } from "../services/FirebaseServices";
+import { uploadFile, saveFormData } from "../../services/FirebaseServices";
 import SignaturePad from "react-signature-canvas";
-import InfoCredit from "./InfoCredit";
-import TextCredit from "./TextCredit";
+import { useFormData } from "../../context/FormDataContext";
+import { currentDate, validateForm,checkFormFields } from "../contractForm/FormUtils";
+import InfoCredit from "../InfoCredit";
+import TextCredit from "../TextCredit";
 
-const ContractForm = () => {
+
+const ContractForm = () => {  
 
   const sigPad = useRef(null);
-  const [selectedFileName, setSelectedFileName] = useState("");
   const [checkboxState, setCheckboxState] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const currentDate = () => {
-    const currentDate = new Date();
-    const day = String(currentDate.getDate()).padStart(2, '0'); // Add leading zero if needed
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
-    const year = currentDate.getFullYear();
-    return `${day}.${month}.${year}`;
-  };
-  const validateForm = (values) => {
-    const errors = {};
-
-    if (!values.firstName) {
-      errors.firstName = "Introdu Numele";
-    }
-    if (!values.lastName) {
-      errors.lastName = "Last name is required";
-    }
-    if (!values.phone) {
-      errors.phone = "Phone is required";
-    } else if (!/^[0-9]+$/.test(values.phone)) {
-      errors.phone = "Phone number is not valid";
-    }
-    if (!values.email) {
-      errors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      errors.email = "Invalid email address";
-    }
-    if (!values.photo) {
-      errors.photo = "Photo is required";
-    } else {
-      // Check if the file type is one of the allowed types
-      if (!["image/png", "image/jpg", "image/jpeg", "image/gif", "image/webp"].includes(values.photo.type)) {
-        errors.photo = "Invalid file type. Only PNG, JPG, GIF, and WEBP are allowed.";
-      }
-      // Check if the file size is greater than 12 MB
-      else if (values.photo.size >= 12582912) {
-        errors.photo = "File size must be less than 12MB";
-      }
-    }
-
-    return errors;
-  };
-  const checkFormFields = (values) => {
-
-    const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'photo'];
-    return requiredFields.every(field => values[field]);
-  };
+  const {
+    formData, setFormData, selectedFileName, setSelectedFileName
+  } = useFormData();
+  
   return (
     <>
       <ToastContainer
@@ -89,51 +49,61 @@ const ContractForm = () => {
             phone: "",
             email: "",
             photo: null,
-            signature: "",
+            signature: null,
           }}
           validate={validateForm}
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             try {
-
-              setSubmitting(true);
-              if (sigPad.current.isEmpty()) {
-                toast.error("Signature is required");
-                return;
-              }
-
               let photoUrl = "";
               let signatureUrl = "";
 
-              const formData = {
-                firstName: values.firstName,
-                lastName: values.lastName,
-                phone: values.phone,
-                email: values.email,
-              };
+              setSubmitting(true);
+
+           
 
               if (values.photo) {
-                photoUrl = await uploadFile(values.photo, `contracts`);
-              }
-              // Prepare and upload the signature if present
-              if (sigPad.current && !sigPad.current.isEmpty()) {
-                const signatureBlob = await new Promise((resolve) =>
-                  sigPad.current
-                    .getTrimmedCanvas()
-                    .toBlob((blob) => resolve(blob), "image/png")
-                );
-                if (signatureBlob) {
-                  signatureUrl = await uploadFile(
-                    signatureBlob,
-                    `contracts`,
-                    "signature.png"
-                  );
+                try {
+                  photoUrl = await uploadFile(values.photo, `contracts`);
+                  values.photo = photoUrl;
+                } catch (error) {
+                  console.error("Error uploading photo: ", error);
+                  toast.error("Error uploading photo");
+                  setSubmitting(false);
+                  return;
                 }
               }
-              formData.photoUrl = photoUrl;
-              formData.signatureUrl = signatureUrl;
-
-              await saveFormData(formData);
-              
+              if (sigPad.current && sigPad.current.isEmpty()) {
+                toast.error("Signature is required");
+                setSubmitting(false);
+                return;
+              }
+              if (sigPad.current && !sigPad.current.isEmpty()) {
+                try {
+                  const signatureBlob = await new Promise((resolve) =>
+                    sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
+                  );
+                  // const signatureData = sigPad.current.toDataURL("image/png");
+                  // console.log("Signature data:", signatureData);
+                  if (signatureBlob) {
+                    signatureUrl = await uploadFile(signatureBlob, 'contracts');
+                    values.signature = signatureUrl;
+                  }
+                } catch (error) {
+                  console.error("Error uploading signature: ", error);
+                  toast.error("Error uploading signature");
+                  setSubmitting(false);
+                  return;
+                }
+              }
+              const documentData = {
+                ...values
+      
+       
+              };
+              setFormData(documentData);
+              console.log(setFormData, "setFormData")
+              delete documentData.photo;
+              await saveFormData(documentData);
               toast.success("Form submitted successfully!");
               resetForm();
               sigPad.current.clear();
@@ -141,7 +111,6 @@ const ContractForm = () => {
               console.error("Error submitting form: ", error);
               toast.error("Error submitting form");
             } finally {
-
               setSubmitting(false);
             }
           }}
@@ -205,14 +174,14 @@ const ContractForm = () => {
 
                       <label htmlFor="photo" className="flex flex-col items-center justify-center w-full h-64 border-2 border-green-300 border-dashed rounded-lg cursor-pointer bg-green-50">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <p><FcAddImage size={50}/></p>
+                          <p><FcAddImage size={50} /></p>
                           <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Apasă pentru</span> a insera o imagine</p>
                           <p className="text-xs text-gray-500">-</p>
                           <p className="text-xs text-gray-500">PNG, JPG, JPEG, WEBP </p>
                           <p className="text-xs text-gray-500 mb-2">Fisierul trebuie să contină maxim 12MB</p>
-                       
+
                         </div>
-                        {selectedFileName && <p className="text-sm text-gray-800">Fisierul Selectat: {selectedFileName}</p>} 
+                        {selectedFileName && <p className="text-sm text-gray-800">Fisierul Selectat: {selectedFileName}</p>}
                         <input
                           id="photo"
                           name="photo"
@@ -222,11 +191,11 @@ const ContractForm = () => {
                           onChange={(event) => {
                             const file = event.currentTarget.files[0];
                             if (file) {
-                         
+
                               if (["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(file.type)) {
                                 if (file.size < 12582912) { // 12 MB
-                                  setSelectedFileName(file.name); 
-                                  setFieldValue("photo", file); 
+                                  setSelectedFileName(file.name);
+                                  setFieldValue("photo", file);
                                 } else {
                                   setSelectedFileName("");
                                   toast.error("File size must be less than 12MB");
@@ -283,6 +252,7 @@ const ContractForm = () => {
                   </button>
                 </div>
               </>
+    
             </Form>
           )}
         </Formik>
