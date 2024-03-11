@@ -269,7 +269,7 @@ const ContractForm = () => {
           )}
         </Formik>
        
-        {/* <ModalPopup visible={modalVisible} setLoading={loadingData ? false : true} /> */}
+        <ModalPopup visible={modalVisible} setLoading={loadingData ? false : true} />
       </div>
 
     </>

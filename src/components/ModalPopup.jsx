@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "../components/Button";
+
 import ReactLoading from 'react-loading';
  
 const Example = ({ type, color }) => (
@@ -17,7 +17,7 @@ const ModalPopup = ({ visible, setLoading }) => {
                                 <p className="my-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis, aliquid.</p>
                                 <p className="mb-2">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quo harum itaque repudiandae molestiae a.</p>
                                 <p className="self-start mb-6">Daca fisierul nu s-a salvat automat. <a className="underline  text-blue-900 text-md pointer"> Click aici!! </a></p>
-                                <a href="https://www.obtinecredit.ro" target="_self" className="flex justify-center w-full h-full pointer"><Button>Afla mai multe</Button></a>
+                                <a href="https://www.obtinecredit.ro" target="_self" className="flex justify-center w-full h-full pointer"><button>Afla mai multe</button></a>
                             </div>
                         </>
                     ) : (
