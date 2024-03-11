@@ -5,13 +5,13 @@ import SignaturePad from "react-signature-canvas";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import { saveFormDataWithFiles } from "../../services/FirebaseServices";
-import { useFormData } from "../../context/FormDataContext";
+
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
+
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
-import html2pdf from 'html2pdf.js';
-// import MyDocument from "../PdfGenerator";
 
+import generatePDFBlob from "../GeneratePdf"
 const ContractForm = () => {
 
   const sigPad = useRef(null);
@@ -20,28 +20,53 @@ const ContractForm = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [showPdf, setShowPdf] = useState(false);
   /* global */
-  const {
-    formData, setFormData, selectedFileName, setSelectedFileName
-  } = useFormData();
-  const generatePDFBlob = async (values) => {
-    const content = document.createElement('div');
-    let htmlContent = `
-      <h2>Title</h2>
-      <p>First Name: ${values.firstName}</p>
-      <p>Last Name: ${values.lastName}</p>
-      <p>Phone: ${values.phone}</p>
-      <p>Email: ${values.email}</p>
-      <p>Signature: <img src="${values.signature}" alt="signature" style="width:200px;height:auto;"/></p>
-    `;
-    content.innerHTML = htmlContent;
-    const blobB = await html2pdf(content, {
-      filename: `${values.firstName}`,
-      margin: [10, 10, 10, 10],
-      html2canvas: { scale: 1 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      output: 'blob'
-    });
-    return blobB;
+
+  // const generatePDFBlob = async (values) => {
+  //   const content = document.createElement('div');
+  //   let htmlContent = `
+  //     <h2>Title</h2>
+  //     <p>First Name: ${values.firstName}</p>
+  //     <p>Last Name: ${values.lastName}</p>
+  //     <p>Phone: ${values.phone}</p>
+  //     <p>Email: ${values.email}</p>
+
+  //     <p>Signature: <img src="${values.signature}" alt="signature" style="width:200px;height:auto;"/></p>
+  //   `;
+  //   content.innerHTML = htmlContent;
+  //   // Ensure the signature image is loaded before converting to PDF
+  //   await new Promise(resolve => {
+  //     const img = new Image();
+  //     img.src = values.signature;
+  //     img.onload = resolve;
+  //   });
+
+  //   const blobB = await html2pdf(content, {
+  //     filename: `${values.firstName}`,
+  //     margin: [10, 10, 10, 10],
+  //     html2canvas: { scale: 1 },
+  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+  //     output: 'blob'
+  //   });
+
+  //   return blobB;
+  // };
+
+  // Function to initiate PDF download
+  const downloadPDF = async (values) => {
+    try {
+      const blob = await generatePDFBlob(values);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${values.firstName}_contract.pdf`; // Adjust the file name as needed
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Handle error if PDF generation fails
+    }
   };
   return (
     <>
@@ -83,19 +108,13 @@ const ContractForm = () => {
               const signatureBlob = await new Promise((resolve) =>
                 sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
               );
+              const signatureData = sigPad.current.toDataURL("image/png");
               if (signatureBlob) {
-                values.signature = signatureBlob;
+                values.signature = signatureData;
               }
             }
-            // Construct formData
-            const formData = {
-              firstName: values.firstName,
-              lastName: values.lastName,
-              phone: values.phone,
-              email: values.email
-              // Add other form fields here
-            };
-       
+
+
             // Prepare filesInfo
             const filesInfo = {
               photo: {
@@ -107,16 +126,18 @@ const ContractForm = () => {
                 file: values.signature, // This should be a Blob or File object
                 path: "user_signatures",
                 pname: `signature_${values.firstName}_${values.lastName}`
-              }
-              // Add other file fields here
+              },
+
+
             };
 
             try {
               // Save form data and files
-              const savedData = await saveFormDataWithFiles(formData, filesInfo);
+              const savedData = await saveFormDataWithFiles(values, filesInfo);
               console.log("Form submitted successfully:", savedData.id);
               // Handle after save success
-              setFormData(savedData);
+              // setFormData(savedData);
+              downloadPDF(values)
               setShowPdf(true);
               toast.success("Form submitted successfully!");
             } catch (error) {
@@ -195,7 +216,7 @@ const ContractForm = () => {
                           <p className="text-xs text-gray-500 mb-2">Fisierul trebuie să contină maxim 12MB</p>
 
                         </div>
-                        {selectedFileName && <p className="text-sm text-gray-800">Fisierul Selectat: {selectedFileName}</p>}
+                        {values.photo && <p className="text-sm text-gray-800">Fisierul Selectat: {values.photo.name}</p>}
 
                         <Field   // This is the hidden input field for file upload, if i use formik <field we need value to be undifined and empty string for photo ,if i use <input> tag works fine witout unfined and empty string
                           id="photo"
@@ -208,21 +229,19 @@ const ContractForm = () => {
                             if (file) {
                               if (["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(file.type)) {
                                 if (file.size <= 12582912) { // max 12 MB
-                                  setSelectedFileName(file.name);
                                   setFieldValue("photo", file);
+                                  toast.success("Fisierul a fost incarcat cu succes.");
                                 } else {
-                                  setSelectedFileName("");
                                   toast.error("Fisierul trebuie sa contina maxim 12MB");
                                 }
                               } else {
-                                setSelectedFileName("");
-                                toast.error("Fisier invalid. extensia PNG, JPG, and WEBP este obligatorie.");
+                                toast.error("Fisier invalid. Extensia PNG, JPG, and WEBP este obligatorie.");
                               }
                             } else {
-                              setFieldValue("photo", ""); // Set an empty string if no file is selected
+                              setFieldValue("photo", ""); // Set to empty string when no file is selected
                             }
                           }}
-                          value={undefined} // Set value to undefined to avoid the warning
+                          value="" // Set value to empty string to clear the component
                         />
                       </label>
 
@@ -259,7 +278,7 @@ const ContractForm = () => {
                     </div>
                     {/* date and name */}
                     <div className="flex flex-col mt-12">
-                      <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {formData.firstName || formData.lastName ? `${values.firstName} ${values.lastName}` : " Marian Iordache "}</p>
+                      <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {values.firstName || values.lastName ? `${values.firstName} ${values.lastName}` : " Marian Iordache "}</p>
                       <p className="text-lg"><span className="text-[16px]">Data:</span> {currentDate()}</p>
                     </div>
                   </div>
