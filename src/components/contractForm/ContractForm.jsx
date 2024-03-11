@@ -4,25 +4,45 @@ import { FcAddImage } from "react-icons/fc";
 import SignaturePad from "react-signature-canvas";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
-import { uploadFile, saveFormData } from "../../services/FirebaseServices";
+import { saveFormDataWithFiles } from "../../services/FirebaseServices";
 import { useFormData } from "../../context/FormDataContext";
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
-import MyDocument from "../PdfGenerator";
-import { PDFDownloadLink,PDFViewer } from "@react-pdf/renderer";
+import html2pdf from 'html2pdf.js';
+// import MyDocument from "../PdfGenerator";
+
 const ContractForm = () => {
 
   const sigPad = useRef(null);
- /* check state */
+  /* check state */
   const [checkboxState, setCheckboxState] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [showPdf, setShowPdf] = useState(false); 
-   /* global */
+  const [showPdf, setShowPdf] = useState(false);
+  /* global */
   const {
     formData, setFormData, selectedFileName, setSelectedFileName
   } = useFormData();
-
+  const generatePDFBlob = async (values) => {
+    const content = document.createElement('div');
+    let htmlContent = `
+      <h2>Title</h2>
+      <p>First Name: ${values.firstName}</p>
+      <p>Last Name: ${values.lastName}</p>
+      <p>Phone: ${values.phone}</p>
+      <p>Email: ${values.email}</p>
+      <p>Signature: <img src="${values.signature}" alt="signature" style="width:200px;height:auto;"/></p>
+    `;
+    content.innerHTML = htmlContent;
+    const blobB = await html2pdf(content, {
+      filename: `${values.firstName}`,
+      margin: [10, 10, 10, 10],
+      html2canvas: { scale: 1 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      output: 'blob'
+    });
+    return blobB;
+  };
   return (
     <>
       <ToastContainer
@@ -54,69 +74,58 @@ const ContractForm = () => {
             signature: null,
           }}
           validate={(values) => validateForm(values, sigPad)}   // validation comp
-           // when i press the button 
+          // when i press the button 
           onSubmit={async (values, { setSubmitting, resetForm }) => {
+            setSubmitting(true);
+
+
+            if (sigPad.current && !sigPad.current.isEmpty()) {
+              const signatureBlob = await new Promise((resolve) =>
+                sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
+              );
+              if (signatureBlob) {
+                values.signature = signatureBlob;
+              }
+            }
+            // Construct formData
+            const formData = {
+              firstName: values.firstName,
+              lastName: values.lastName,
+              phone: values.phone,
+              email: values.email
+              // Add other form fields here
+            };
+       
+            // Prepare filesInfo
+            const filesInfo = {
+              photo: {
+                file: values.photo,
+                path: "user_photos", // Specify the path in the storage
+                pname: `photo_${values.firstName}_${values.lastName}`
+              },
+              signature: {
+                file: values.signature, // This should be a Blob or File object
+                path: "user_signatures",
+                pname: `signature_${values.firstName}_${values.lastName}`
+              }
+              // Add other file fields here
+            };
+
             try {
-
-              let photoUrl = "";
-              let signatureUrl = "";
-
-              setSubmitting(true);
-            //add photo to storage and errors
-              if (values.photo) {
-                try {
-                  photoUrl = await uploadFile(values.photo, `contracts`);
-                  values.photo = photoUrl;
-                } catch (error) {
-                  console.error("Error uploading photo: ", error);
-                  toast.error("Error uploading photo");
-                  setSubmitting(false);
-                  return;
-                }
-              }
-                   // not empty resolve blop to png and add to storage and errors
-              if (sigPad.current && !sigPad.current.isEmpty()) {
-                try {
-                  const signatureBlob = await new Promise((resolve) =>
-                    sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
-                  );
-                  // console.log("Signature blob:", signatureBlob);
-                  // const signatureData = sigPad.current.toDataURL("image/png");
-              
-                  if (signatureBlob) {
-                    signatureUrl = await uploadFile(signatureBlob, 'contracts');
-                    console.log("signatureUrl:", signatureUrl);
-                    values.signature = signatureUrl;
-              
-                  }
-                } catch (error) {
-                  console.error("Error uploading signature: ", error);
-                  toast.error("Error uploading signature");
-                  setSubmitting(false);
-                  return;
-                }
-              }
-               // check signature canvas
-               if (sigPad.current && sigPad.current.isEmpty()) {
-                toast.error("Signature is required");
-                setSubmitting(false);
-                return;
-              }
-               // update formdata to global 
-              const updatedFormData = { ...values };
-              setFormData(updatedFormData);
-               // save formdata to db 
-              await saveFormData(updatedFormData);
+              // Save form data and files
+              const savedData = await saveFormDataWithFiles(formData, filesInfo);
+              console.log("Form submitted successfully:", savedData.id);
+              // Handle after save success
+              setFormData(savedData);
               setShowPdf(true);
+              toast.success("Form submitted successfully!");
             } catch (error) {
-              console.error("Error submitting form: ", error);
-              toast.error("Error submitting form");
+              console.error("Error: ", error);
+              toast.error("An error occurred. Please try again.");
             } finally {
               setSubmitting(false);
-              toast.success("Form submitted successfully!");
-               // reset
-               resetForm();
-              sigPad.current.clear();
+              resetForm();
+              sigPad.current.clear(); // Clear the signature pad
             }
           }}
         >
@@ -187,7 +196,7 @@ const ContractForm = () => {
 
                         </div>
                         {selectedFileName && <p className="text-sm text-gray-800">Fisierul Selectat: {selectedFileName}</p>}
-                       
+
                         <Field   // This is the hidden input field for file upload, if i use formik <field we need value to be undifined and empty string for photo ,if i use <input> tag works fine witout unfined and empty string
                           id="photo"
                           name="photo"
@@ -229,10 +238,10 @@ const ContractForm = () => {
                       }} />
                       <span className="text-gray-700 sm:text-sm text-sm">Sunt de acord cu procesarea datelor mele conform 'Politica de Confidențialitate' și 'Termeni și Condiții'</span>
                     </div>
-                      {/* error when check */}
+                    {/* error when check */}
                     {!isFormValid && checkboxState && <div className="error text-center">completează toate campurile</div>}
                   </div>
-                    {/* signature */}
+                  {/* signature */}
                   <div className="mb-4 flex sm:flex-row-reverse flex-col-reverse justify-around">
                     <div className="mt-4">
                       <label className="mb-2" htmlFor="signature">Semnatură client<span>*</span></label>
@@ -248,7 +257,7 @@ const ContractForm = () => {
                         Resetează
                       </a>
                     </div>
-                       {/* date and name */}
+                    {/* date and name */}
                     <div className="flex flex-col mt-12">
                       <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {formData.firstName || formData.lastName ? `${values.firstName} ${values.lastName}` : " Marian Iordache "}</p>
                       <p className="text-lg"><span className="text-[16px]">Data:</span> {currentDate()}</p>
@@ -260,19 +269,19 @@ const ContractForm = () => {
                   <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`}>
                     Trimite Contractul
                   </button>
-    
+
                 </div>
-           
+
               </>
             </Form>
           )}
         </Formik>
       </div>
-      {showPdf && (
+      {/* {showPdf && (
         <div>
-            <MyDocument />
+          <MyDocument />
         </div>
-      )}
+      )} */}
     </>
   );
 };
