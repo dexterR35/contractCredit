@@ -1,57 +1,23 @@
 import React, { useState, useRef } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import { FcAddImage } from "react-icons/fc";
 import SignaturePad from "react-signature-canvas";
+import { FcAddImage } from "react-icons/fc";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import { saveFormDataWithFiles } from "../../services/FirebaseServices";
-
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
 
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
-
 import generatePDFBlob from "../GeneratePdf"
+
 const ContractForm = () => {
 
   const sigPad = useRef(null);
-  /* check state */
   const [checkboxState, setCheckboxState] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [showPdf, setShowPdf] = useState(false);
-  /* global */
 
-  // const generatePDFBlob = async (values) => {
-  //   const content = document.createElement('div');
-  //   let htmlContent = `
-  //     <h2>Title</h2>
-  //     <p>First Name: ${values.firstName}</p>
-  //     <p>Last Name: ${values.lastName}</p>
-  //     <p>Phone: ${values.phone}</p>
-  //     <p>Email: ${values.email}</p>
 
-  //     <p>Signature: <img src="${values.signature}" alt="signature" style="width:200px;height:auto;"/></p>
-  //   `;
-  //   content.innerHTML = htmlContent;
-  //   // Ensure the signature image is loaded before converting to PDF
-  //   await new Promise(resolve => {
-  //     const img = new Image();
-  //     img.src = values.signature;
-  //     img.onload = resolve;
-  //   });
-
-  //   const blobB = await html2pdf(content, {
-  //     filename: `${values.firstName}`,
-  //     margin: [10, 10, 10, 10],
-  //     html2canvas: { scale: 1 },
-  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-  //     output: 'blob'
-  //   });
-
-  //   return blobB;
-  // };
-
-  // Function to initiate PDF download
   const downloadPDF = async (values) => {
     try {
       const blob = await generatePDFBlob(values);
@@ -68,6 +34,7 @@ const ContractForm = () => {
       // Handle error if PDF generation fails
     }
   };
+
   return (
     <>
       <ToastContainer
@@ -103,7 +70,6 @@ const ContractForm = () => {
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
 
-
             if (sigPad.current && !sigPad.current.isEmpty()) {
               const signatureBlob = await new Promise((resolve) =>
                 sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
@@ -113,7 +79,6 @@ const ContractForm = () => {
                 values.signature = signatureData;
               }
             }
-
 
             // Prepare filesInfo
             const filesInfo = {
@@ -128,17 +93,14 @@ const ContractForm = () => {
                 pname: `signature_${values.firstName}_${values.lastName}`
               },
 
-
             };
 
             try {
               // Save form data and files
               const savedData = await saveFormDataWithFiles(values, filesInfo);
               console.log("Form submitted successfully:", savedData.id);
-              // Handle after save success
-              // setFormData(savedData);
               downloadPDF(values)
-              setShowPdf(true);
+
               toast.success("Form submitted successfully!");
             } catch (error) {
               console.error("Error: ", error);
@@ -230,7 +192,7 @@ const ContractForm = () => {
                               if (["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(file.type)) {
                                 if (file.size <= 12582912) { // max 12 MB
                                   setFieldValue("photo", file);
-                                  toast.success("Fisierul a fost incarcat cu succes.");
+                                  toast.info("Fisierul a fost adaugat cu succes.");
                                 } else {
                                   toast.error("Fisierul trebuie sa contina maxim 12MB");
                                 }
@@ -296,11 +258,7 @@ const ContractForm = () => {
           )}
         </Formik>
       </div>
-      {/* {showPdf && (
-        <div>
-          <MyDocument />
-        </div>
-      )} */}
+
     </>
   );
 };

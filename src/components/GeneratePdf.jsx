@@ -5,18 +5,45 @@ import TextCredit from "./TextCredit";
 
 const generatePDFBlob = async (values) => {
   const content = document.createElement("div");
+  const textCredit = ReactDOMServer.renderToString(<TextCredit />);
   let htmlContent = `
-    <h2>Title</h2>
-    <p>First Name: ${values.firstName}</p>
-    <p>Last Name: ${values.lastName}</p>
-    <p>Phone: ${values.phone}</p>
-    <p>Email: ${values.email}</p>
-    <p>Signature: <img src="${values.signature}" alt="signature" style="width:200px;height:auto;"/></p>
+<style>
+.container_bottom {
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  gap:20px;
+}
+.signature_container {
+  display:flex;justify-content:center;flex-direction:row;align-items:center;
+}
+// .name_container {
+//   background:red;
+//   width:fit-content;
+// }
+// .signature_container{
+//   background:cyan;
+//   width:fit-content;
+// }
+
+</style>
+
+
+  <div class="pdf-container">
+    <h2 style="text-align:center; width:100%">Title</h2>
+    <br/>
+    ${textCredit}
+    <br/>
+    <div class="container_bottom">
+      <div class="name_container"><span>Nume:</span> <span>${values.firstName} ${values.lastName}</span></div>
+      <div class="signature_container"><span>Semnatura:</span><img src="${values.signature}" alt="signature" style="width:150px;height:auto;"/></div>
+    </div>
+  </div>
   `;
 
   // Include text from TextCredit component
-  const textCredit = ReactDOMServer.renderToString(<TextCredit />);
-  htmlContent += textCredit;
 
   content.innerHTML = htmlContent;
 
@@ -27,9 +54,19 @@ const generatePDFBlob = async (values) => {
     img.onload = resolve;
   });
 
-  try {
-    const blobB = await html2pdf().from(content).output("blob");
-    return blobB;
+
+    try {
+      const options = {
+          margin: [15, 15, 20, 15], // in mm
+          filename: 'document.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 1 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+  
+      // Notice the change here from toBlob() to output('blob')
+      const blobB = await html2pdf().set(options).from(content).output('blob');
+      return blobB;
   } catch (error) {
     console.error('Error generating PDF:', error);
     throw error;
