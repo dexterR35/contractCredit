@@ -2,26 +2,22 @@
 import { db, storage } from "./FirebaseConfig";
 import { doc, setDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import generatePDFBlob from "../components/GeneratePdf"; // Import the function to generate PDF blob
+import generatePDFBlob from "../components/GeneratePdf";
 
 export const saveFormDataWithFiles = async (formData, filesInfo) => {
-
   const docRef = doc(collection(db, "contracts"));
   try {
     // Generate PDF blob
     const pdfBlob = await generatePDFBlob(formData);
-
     // Upload PDF to Firebase Storage
     const pdfPath = `contracts/${docRef.id}/${formData.firstName}_${formData.lastName}_contract.pdf`;
     const pdfRef = ref(storage, pdfPath);
     await uploadBytes(pdfRef, pdfBlob);
-
     // Get download URL of uploaded PDF
     const pdfUrl = await getDownloadURL(pdfRef);
-
     // Prepare updates for other files
     const updates = {};
-
+       // Prepare names and path /download/upload other files
     for (const fieldName in filesInfo) {
       const fileDetails = filesInfo[fieldName];
       if (fileDetails.file && fieldName !== "pdf") {
@@ -34,14 +30,10 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
         console.log(`${fieldName} uploaded successfully:`, fileUrl);
       }
     }
-
     // Save form data along with PDF URL and other file URLs to Firestore
-
     const data = { ...formData, pdfUrl, ...updates };
-
     // Save the merged data to the Firestore document
     await setDoc(docRef, data);
-
     return { id: docRef.id, ...data };
   } catch (error) {
     console.error("Error saving form data:", error);

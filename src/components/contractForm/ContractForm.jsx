@@ -6,7 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import { saveFormDataWithFiles } from "../../services/FirebaseServices";
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
-
+import ModalPopup from "../ModalPopup";
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
 import generatePDFBlob from "../GeneratePdf"
@@ -16,8 +16,8 @@ const ContractForm = () => {
   const sigPad = useRef(null);
   const [checkboxState, setCheckboxState] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
-
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [loadingData, setLoadingData] = useState(null);
   const downloadPDF = async (values) => {
     try {
       const blob = await generatePDFBlob(values);
@@ -69,8 +69,16 @@ const ContractForm = () => {
           // when i press the button 
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
+            // check pad signature
+            setModalVisible(true);
+            if (sigPad.current && sigPad.current.isEmpty()) {
+              toast.error("Signature is required");
+              setSubmitting(false);
+              return;
+            }
 
             if (sigPad.current && !sigPad.current.isEmpty()) {
+              // prepare signature 
               const signatureBlob = await new Promise((resolve) =>
                 sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
               );
@@ -84,31 +92,31 @@ const ContractForm = () => {
             const filesInfo = {
               photo: {
                 file: values.photo,
-                path: "user_photos", // Specify the path in the storage
                 pname: `photo_${values.firstName}_${values.lastName}`
               },
               signature: {
-                file: values.signature, // This should be a Blob or File object
-                path: "user_signatures",
+                file: values.signature,
                 pname: `signature_${values.firstName}_${values.lastName}`
               },
-
             };
-
             try {
               // Save form data and files
               const savedData = await saveFormDataWithFiles(values, filesInfo);
               console.log("Form submitted successfully:", savedData.id);
-              downloadPDF(values)
-
-              toast.success("Form submitted successfully!");
+              // donwload pdf
+              setLoadingData(savedData);
             } catch (error) {
               console.error("Error: ", error);
               toast.error("An error occurred. Please try again.");
             } finally {
+              //reset and dw
+              if (loadingData) {
+                downloadPDF(values);
+                toast.success("Form submitted successfully!");
+              }
               setSubmitting(false);
               resetForm();
-              sigPad.current.clear(); // Clear the signature pad
+              sigPad.current.clear();
             }
           }}
         >
@@ -257,6 +265,7 @@ const ContractForm = () => {
             </Form>
           )}
         </Formik>
+        <ModalPopup visible={modalVisible} setLoading={loadingData ? true : false} />
       </div>
 
     </>
