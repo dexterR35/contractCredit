@@ -9,6 +9,7 @@ import { currentDate, validateForm, checkFormFields } from "../contractForm/Vali
 import ModalPopup from "../ModalPopup";
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
+
 import generatePDFBlob from "../GeneratePdf"
 
 const ContractForm = () => {
@@ -18,6 +19,8 @@ const ContractForm = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingData, setLoadingData] = useState(null);
+
+ 
   const downloadPDF = async (values) => {
     try {
       const blob = await generatePDFBlob(values);
@@ -112,7 +115,7 @@ const ContractForm = () => {
               //reset and dw
               if (loadingData) {
                 downloadPDF(values);
-                toast.success("Form submitted successfully!");
+                // toast.success("Form submitted successfully!");
               }
               setSubmitting(false);
               resetForm();
@@ -121,7 +124,7 @@ const ContractForm = () => {
           }}
         >
           {({ isSubmitting, setFieldValue, values }) => (
-            <Form className="select-none">
+            <Form className="select-none" >
               <>
                 <div className="mt-10 gap-x-6 gap-y-2 flex flex-col">
                   {/* Form fields */}
@@ -221,14 +224,14 @@ const ContractForm = () => {
                   <TextCredit />
                   <div className="my-2">
                     <div className="flex flex-row space-x-5 sm:w-[80%] w-full">
-                      <Field className="w-[25px]" type="checkbox" name="checkbox" checked={checkboxState} onChange={e => {
+                      <Field className="w-[25px]" type="checkbox" name="checkbox" checked={checkboxState}  onChange={e => {
                         setCheckboxState(e.target.checked);
                         setIsFormValid(e.target.checked && checkFormFields(values, sigPad));
                       }} />
                       <span className="text-gray-700 sm:text-sm text-sm">Sunt de acord cu procesarea datelor mele conform 'Politica de Confidențialitate' și 'Termeni și Condiții'</span>
                     </div>
                     {/* error when check */}
-                    {!isFormValid && checkboxState && <div className="error text-center">completează toate campurile</div>}
+                    {!isFormValid && checkboxState && <div className="error my-2 text-start">Completează toate campurile.</div>}
                   </div>
                   {/* signature */}
                   <div className="mb-4 flex sm:flex-row-reverse flex-col-reverse justify-around">
@@ -255,9 +258,9 @@ const ContractForm = () => {
                 </div>
                 {/* button disabled when is not value or signature or photo */}
                 <div className="container-buttons flex gap-3 mx-auto my-8">
-                  <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`}>
-                    Trimite Contractul
-                  </button>
+                <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`} >  Trimite Contractul</button>
+                
+           
 
                 </div>
 
@@ -265,7 +268,8 @@ const ContractForm = () => {
             </Form>
           )}
         </Formik>
-        <ModalPopup visible={modalVisible} setLoading={loadingData ? true : false} />
+       
+        {/* <ModalPopup visible={modalVisible} setLoading={loadingData ? false : true} /> */}
       </div>
 
     </>

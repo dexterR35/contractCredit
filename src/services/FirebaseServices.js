@@ -13,6 +13,7 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
     const pdfPath = `contracts/${docRef.id}/${formData.firstName}_${formData.lastName}_contract.pdf`;
     const pdfRef = ref(storage, pdfPath);
     await uploadBytes(pdfRef, pdfBlob);
+    console.log(uploadBytes,"upby")
     // Get download URL of uploaded PDF
     const pdfUrl = await getDownloadURL(pdfRef);
     // Prepare updates for other files
@@ -30,6 +31,7 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
         console.log(`${fieldName} uploaded successfully:`, fileUrl);
       }
     }
+     
     // Save form data along with PDF URL and other file URLs to Firestore
     const data = { ...formData, pdfUrl, ...updates };
     // Save the merged data to the Firestore document

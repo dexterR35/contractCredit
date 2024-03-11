@@ -1,3 +1,4 @@
+import { toast, ToastContainer } from "react-toastify";
 export const currentDate = () => {
     const currentDate = new Date();
     const day = String(currentDate.getDate()).padStart(2, '0'); // Add leading zero if needed
@@ -48,7 +49,6 @@ export const validateForm = (values,sigPad) => {
 export const checkFormFields = (values, sigPad) => {
     const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'photo'];
     const allFieldsFilled = requiredFields.every(field => values[field]);
-
     // Check if the signature is filled
     const isSignatureFilled = sigPad.current && !sigPad.current.isEmpty();
     return allFieldsFilled && isSignatureFilled;
