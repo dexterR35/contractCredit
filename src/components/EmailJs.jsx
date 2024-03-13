@@ -4,8 +4,8 @@
 import emailjs from 'emailjs-com';
 import { toast } from 'react-toastify';
 
-export const sendEmail = async (formValues, pdfBlob) => {
-  if (!formValues.email) {
+export const sendEmail = async (values, fileUrls) => {
+  if (!values.email) {
     toast.error("Email address is required.");
     return;
   }
@@ -13,29 +13,34 @@ export const sendEmail = async (formValues, pdfBlob) => {
   try {
     const templateParams = {
       from_name: "ObtineCredit.ro",
-      to_name: `${formValues.firstName} ${formValues.lastName}`,
-      reply_to: formValues.email,
+      to_name: `${values.firstName} ${values.lastName}`,
+      reply_to: values.email,
     };
 
-    const serviceId = 'service_66zfxbl'; // Update with your EmailJS service ID
-    const templateId = 'template_28hl07u'; // Update with your EmailJS template ID
-    const userId = '0LuwZPt-8aGtf94ka'
-    const attachment = new Blob([pdfBlob], { type: 'application/pdf' });
-    const attachmentName = 'document.pdf';
+    const serviceId = import.meta.env.VITE_REACT_APP_EMAIL_serviceId; // Update with your EmailJS service ID
+    const templateId = import.meta.env.VITE_REACT_APP_EMAIL_templateId; // Update with your EmailJS template ID
+    const userId = import.meta.env.VITE_REACT_APP_EMAIL_userId
+
+    console.log('Service ID:', serviceId);
+    console.log('Template ID:', templateId);
+    console.log('User ID:', userId);
 
     const emailParams = {
       ...templateParams,
       ...{
         message_html: `
-          <p>Nume: ${formValues.firstName}</p>
-          <p>Prenume: ${formValues.lastName}</p>
-          <p>Telefon: ${formValues.phone}</p>
-          <p>Email: ${formValues.email}</p>
-        `
+          Nume: ${values.firstName}
+          Prenume: ${values.lastName}
+          Telefon: ${values.phone}
+          Email: ${values.email}
+          download:${fileUrls};
+         
+        `,
+        download_link: ` Contract:<a href="${fileUrls}">Download File</a><br>;`
       }
     };
 
-    await emailjs.send(serviceId, templateId, emailParams, { attachment, name: attachmentName }, userId);
+    await emailjs.send(serviceId, templateId, emailParams, userId);
     toast.success("Email sent successfully!");
   } catch (error) {
     console.error("Error sending email: ", error);

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import SignaturePad from "react-signature-canvas";
 import { FcAddImage } from "react-icons/fc";
@@ -20,7 +20,7 @@ const ContractForm = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingData, setLoadingData] = useState(null);
 
- 
+
   const downloadPDF = async (values) => {
     try {
       const blob = await generatePDFBlob(values);
@@ -54,7 +54,7 @@ const ContractForm = () => {
         theme="light"
         transition:Bounce
       />
-      <div className="mx-auto max-w-3xl sm:p-8 p-3 bg-white">
+      <div className="mx-auto max-w-3xl sm:p-8 px-6 py-2 bg-white">
         <h2 className="text-[24px] sm:text-2xl font-bold text-center my-10">
           Contract de Prestari Servicii
         </h2>
@@ -113,10 +113,9 @@ const ContractForm = () => {
               toast.error("An error occurred. Please try again.");
             } finally {
               //reset and dw
-              if (loadingData) {
-                downloadPDF(values);
-                // toast.success("Form submitted successfully!");
-              }
+              downloadPDF(values);
+              // sendEmail(values)
+              // toast.success("Form submitted successfully!");
               setSubmitting(false);
               resetForm();
               sigPad.current.clear();
@@ -203,7 +202,7 @@ const ContractForm = () => {
                               if (["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(file.type)) {
                                 if (file.size <= 12582912) { // max 12 MB
                                   setFieldValue("photo", file);
-                                  toast.info("Fisierul a fost adaugat cu succes.");
+                                  // toast.info("Fisierul a fost adaugat cu succes.");
                                 } else {
                                   toast.error("Fisierul trebuie sa contina maxim 12MB");
                                 }
@@ -224,17 +223,17 @@ const ContractForm = () => {
                   <TextCredit />
                   <div className="my-2">
                     <div className="flex flex-row space-x-5 sm:w-[80%] w-full">
-                      <Field className="w-[25px]" type="checkbox" name="checkbox" checked={checkboxState}  onChange={e => {
+                      <Field className="w-[25px]" type="checkbox" name="checkbox" checked={checkboxState} onChange={e => {
                         setCheckboxState(e.target.checked);
                         setIsFormValid(e.target.checked && checkFormFields(values, sigPad));
                       }} />
-                      <span className="text-gray-700 sm:text-sm text-sm">Sunt de acord cu procesarea datelor mele conform 'Politica de Confidențialitate' și 'Termeni și Condiții'</span>
+                      <span className="text-gray-700 sm:text-sm text-sm w-full">Sunt de acord cu procesarea datelor mele conform 'Politica de Confidențialitate' și 'Termeni și Condiții'</span>
                     </div>
                     {/* error when check */}
                     {!isFormValid && checkboxState && <div className="error my-2 text-start">Completează toate campurile.</div>}
                   </div>
                   {/* signature */}
-                  <div className="mb-4 flex sm:flex-row-reverse flex-col-reverse justify-around">
+                  <div className="mb-4 flex sm:flex-row-reverse flex-col justify-around">
                     <div className="mt-4">
                       <label className="mb-2" htmlFor="signature">Semnatură client<span>*</span></label>
                       <div className="canvas_container border border-1 border-gray-200">
@@ -258,17 +257,14 @@ const ContractForm = () => {
                 </div>
                 {/* button disabled when is not value or signature or photo */}
                 <div className="container-buttons flex gap-3 mx-auto my-8">
-                <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`} >  Trimite Contractul</button>
-                
-           
-
+                  <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`} >  Trimite Contractul</button>
                 </div>
 
               </>
             </Form>
           )}
         </Formik>
-       
+
         <ModalPopup visible={modalVisible} setLoading={loadingData ? false : true} />
       </div>
 

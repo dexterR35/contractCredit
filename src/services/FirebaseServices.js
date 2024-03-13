@@ -3,7 +3,7 @@ import { db, storage } from "./FirebaseConfig";
 import { doc, setDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import generatePDFBlob from "../components/GeneratePdf";
-
+import {sendEmail} from "../components/EmailJs"
 export const saveFormDataWithFiles = async (formData, filesInfo) => {
   const docRef = doc(collection(db, "contracts"));
   try {
@@ -13,9 +13,10 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
     const pdfPath = `contracts/${docRef.id}/${formData.firstName}_${formData.lastName}_contract.pdf`;
     const pdfRef = ref(storage, pdfPath);
     await uploadBytes(pdfRef, pdfBlob);
-    console.log(uploadBytes,"upby")
+
     // Get download URL of uploaded PDF
     const pdfUrl = await getDownloadURL(pdfRef);
+    console.log(pdfUrl,"opdf")
     // Prepare updates for other files
     const updates = {};
        // Prepare names and path /download/upload other files
@@ -28,6 +29,7 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
         const snapshot = await uploadBytes(fileRef, fileDetails.file);
         const fileUrl = await getDownloadURL(snapshot.ref);
         updates[fieldName] = fileUrl;
+        
         console.log(`${fieldName} uploaded successfully:`, fileUrl);
       }
     }
@@ -36,6 +38,7 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
     const data = { ...formData, pdfUrl, ...updates };
     // Save the merged data to the Firestore document
     await setDoc(docRef, data);
+    await sendEmail(formData, pdfUrl, updates); 
     return { id: docRef.id, ...data };
   } catch (error) {
     console.error("Error saving form data:", error);

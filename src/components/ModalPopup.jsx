@@ -1,7 +1,7 @@
-import React from "react";
+
 
 import ReactLoading from 'react-loading';
- 
+
 const Example = ({ type, color }) => (
     <ReactLoading type={type} color={color} height={50} width={50} />
 );
@@ -17,18 +17,18 @@ const ModalPopup = ({ visible, setLoading }) => {
                                 <p className="my-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis, aliquid.</p>
                                 <p className="mb-2">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quo harum itaque repudiandae molestiae a.</p>
                                 <p className="self-start mb-6">Daca fisierul nu s-a salvat automat. <a className="underline  text-blue-900 text-md pointer"> Click aici!! </a></p>
-                                <a href="https://www.obtinecredit.ro" target="_self" className="flex justify-center w-full h-full pointer"><button>Afla mai multe</button></a>
+                                <a href="https://www.obtinecredit.ro" target="_self" className="flex justify-center w-full h-full pointer bg-green-600 max-w-64 rounded-sm"><button>Afla mai multe</button></a>
                             </div>
                         </>
                     ) : (
                         <>
-                        <h2 className="text-2xl font-bold">Datele se trimit...</h2>
-                        <p className="text-center mb-6">Va rugam asteptati</p>
-                        <div className="flex justify-center items-center w-full">
-                        <Example type="spokes" color="#0bb51e" />
-                        </div>
-                     
-                      </>
+                            <h2 className="text-2xl font-bold">Datele se trimit...</h2>
+                            <p className="text-center mb-6">Va rugam asteptati</p>
+                            <div className="flex justify-center items-center w-full">
+                                <Example type="spokes" color="#0bb51e" />
+                            </div>
+
+                        </>
                     )}
                 </div>
             </div>

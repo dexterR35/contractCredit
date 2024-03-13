@@ -21,12 +21,12 @@ canvas {
   width: 100%;
   height: 100% !important;
 }
-form ul li {
+/* form ul li {
   margin: 8px 0;
 }
 form ul p {
   margin: 1rem 0;
-}
+} */
 
 button:not([type="button"]) {
   color: white;
@@ -51,7 +51,7 @@ input:nth-child(5) {
   @apply border-0 p-0;
 }
 input {
-  @apply my-2 w-full border border-gray-300 py-2 px-4 rounded;
+  @apply my-2 w-full border border-gray-300 py-2 px-4 rounded outline-green-500;
 }
 .s label {
   @apply flex flex-row justify-between;

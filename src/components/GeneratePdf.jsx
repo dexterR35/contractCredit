@@ -1,7 +1,9 @@
-import React from "react";
+
 import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import TextCredit from "./TextCredit";
+import { currentDate } from "./contractForm/Validation"
+
 
 const generatePDFBlob = async (values) => {
   const content = document.createElement("div");
@@ -19,26 +21,23 @@ const generatePDFBlob = async (values) => {
 .signature_container {
   display:flex;justify-content:center;flex-direction:row;align-items:center;
 }
-// .name_container {
-//   background:red;
-//   width:fit-content;
-// }
-// .signature_container{
-//   background:cyan;
-//   width:fit-content;
-// }
-
+h2 {
+  font-size:1.4em;
+  font-weight:700;
+  text-align:center;
+  width:100%;
+}
 </style>
 
 
   <div class="pdf-container">
-    <h2 style="text-align:center; width:100%">Title</h2>
+    <h2>Contract de Prestari Servicii</h2>
     <br/>
     ${textCredit}
     <br/>
     <div class="container_bottom">
-      <div class="name_container"><span>Nume:</span> <span>${values.firstName} ${values.lastName}</span></div>
-      <div class="signature_container"><span>Semnatura:</span><img src="${values.signature}" alt="signature" style="width:150px;height:auto;"/></div>
+      <div class="name_container"><span>Nume:</span> <span>${values.firstName} ${values.lastName}</span> <br> Data: ${currentDate()}</div>
+      <div class="signature_container"><span>Semnatura:</span> <br> <img src="${values.signature}" alt="signature" style="width:150px;height:auto;"/></div>
     </div>
   </div>
   `;
@@ -48,25 +47,25 @@ const generatePDFBlob = async (values) => {
   content.innerHTML = htmlContent;
 
   // Ensure the signature image is loaded before converting to PDF
-  await new Promise((resolve) => {
+  await new Promise((resolve, reject) => {
     const img = new Image();
-    img.src = values.signature;
     img.onload = resolve;
+    img.onerror = reject; // Add error handling
+    img.src = values.signature;
   });
 
+  try {
+    const options = {
+      margin: [20, 15, 30, 15], // in mm
+      filename: 'document.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-    try {
-      const options = {
-          margin: [15, 15, 20, 15], // in mm
-          filename: 'document.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 1 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-  
-      // Notice the change here from toBlob() to output('blob')
-      const blobB = await html2pdf().set(options).from(content).output('blob');
-      return blobB;
+    // Notice the change here from toBlob() to output('blob')
+    const blobB = await html2pdf().set(options).from(content).output('blob');
+    return blobB;
   } catch (error) {
     console.error('Error generating PDF:', error);
     throw error;
