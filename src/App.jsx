@@ -3,7 +3,7 @@ import ContractForm from './components/contractForm/ContractForm'
 function App() {
   return (
     <>
-      <div className="bg-green-200">
+      <div className="bg-gray-100">
         <ContractForm />
       </div>
     </>

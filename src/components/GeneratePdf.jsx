@@ -27,6 +27,9 @@ h2 {
   text-align:center;
   width:100%;
 }
+.pdf-container {
+  font-family: sans-serif;
+}
 </style>
 
 

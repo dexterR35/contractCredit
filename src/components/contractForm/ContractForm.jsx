@@ -37,7 +37,7 @@ const ContractForm = () => {
         theme="light"
         transition:Bounce
       />
-      <div className="mx-auto max-w-3xl sm:p-8 px-6 py-2 bg-white">
+      <div className="mx-auto max-w-3xl sm:p-8 px-6 py-2 bg-white shadow-md">
         <h2 className="text-[24px] sm:text-2xl font-bold text-center my-10">
           Contract de Prestari Servicii
         </h2>
@@ -59,6 +59,7 @@ const ContractForm = () => {
             setModalVisible(true);
 
             let signatureBlob;
+
             if (sigPad.current && !sigPad.current.isEmpty()) {
               // prepare signature 
               signatureBlob = await new Promise((resolve) =>
@@ -73,8 +74,6 @@ const ContractForm = () => {
                 return;
               }
             }
-
-
             // Prepare filesInfo
             const filesInfo = {
               photo: {
@@ -90,7 +89,6 @@ const ContractForm = () => {
               // Save form data and files
               const savedData = await saveFormDataWithFiles(values, filesInfo);
               console.log("Form submitted successfully:", savedData.id);
-
               // Define a function to update upload statuses
               if (savedData) {
                 downloadPDF(values); // Only download PDF if form is successfully saved
@@ -98,6 +96,7 @@ const ContractForm = () => {
                 throw new Error('Failed to save form data.');
               }
               setLoadingData(savedData);
+
             } catch (error) {
               console.error("Error: ", error);
               toast.error("An error occurred. Please try again.");
@@ -118,7 +117,6 @@ const ContractForm = () => {
                     <div className="mb-2 s">
                       <label htmlFor="firstName">
                         <div>Nume<span> *</span></div>
-
                         <ErrorMessage
                           name="firstName"
                           component="div"
@@ -132,10 +130,8 @@ const ContractForm = () => {
                         name="lastName"
                         component="div"
                         className="error"
-
                       /></label>
                       <Field name="lastName" />
-
                     </div>
                     <div className="mb-2 s">
                       <label htmlFor="phone"><div>Telefon<span> *</span> </div>  <ErrorMessage
@@ -144,7 +140,6 @@ const ContractForm = () => {
                         className="error"
                       /></label>
                       <Field name="phone" />
-
                     </div>
                     <div className="mb-2 s">
                       <label htmlFor="email"><div>Email<span> *</span> </div>   <ErrorMessage
@@ -153,10 +148,8 @@ const ContractForm = () => {
                         className="error"
                       /></label>
                       <Field name="email" />
-
                     </div>
                     <div className="mb-2">
-
                       <div className="mb-2 flex justify-between">
                         <label>Carte Identitate<span> *</span></label>
                         <ErrorMessage
@@ -165,7 +158,6 @@ const ContractForm = () => {
                           className="error"
                         />
                       </div>
-
                       <label htmlFor="photo" className="flex flex-col items-center justify-center w-full h-64 border-2 border-green-300 border-dashed rounded-lg cursor-pointer bg-green-50">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <p><FcAddImage size={50} /></p>
@@ -173,10 +165,8 @@ const ContractForm = () => {
                           <p className="text-xs text-gray-500">-</p>
                           <p className="text-xs text-gray-500">PNG, JPG, JPEG, WEBP </p>
                           <p className="text-xs text-gray-500 mb-2">Fisierul trebuie să contină maxim 12MB</p>
-
                         </div>
                         {values.photo && <p className="text-sm text-gray-800">Fisierul Selectat: {values.photo.name}</p>}
-
                         <Field   // This is the hidden input field for file upload, if i use formik <field we need value to be undifined and empty string for photo ,if i use <input> tag works fine witout unfined and empty string
                           id="photo"
                           name="photo"
@@ -203,7 +193,6 @@ const ContractForm = () => {
                           value="" // Set value to empty string to clear the component
                         />
                       </label>
-
                     </div>
                   </div>
                   {/*  Text from object*/}
@@ -246,15 +235,12 @@ const ContractForm = () => {
                 <div className="container-buttons flex gap-3 mx-auto my-8">
                   <button type="submit" disabled={isSubmitting || !checkboxState || !isFormValid} className={`${isSubmitting || !checkboxState || !isFormValid ? 'bg-gray-400' : 'bg-green-600'}`} >  Trimite Contractul</button>
                 </div>
-
               </>
             </Form>
           )}
         </Formik>
-
-        <ModalPopup visible={modalVisible} setLoading={loadingData ? false : true} />
+        <ModalPopup visible={modalVisible} setLoading={loadingData ? false : true} emailUser={loadingData ? loadingData.email : null} pdfUser={loadingData ? loadingData.pdfUrl : null} />
       </div>
-
     </>
   );
 };
