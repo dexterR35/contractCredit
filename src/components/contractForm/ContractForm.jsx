@@ -6,11 +6,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import { saveFormDataWithFiles } from "../../services/FirebaseServices";
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
+import { downloadPDF } from "../contractForm/DwPdf"
 import ModalPopup from "../ModalPopup";
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
-
-import generatePDFBlob from "../GeneratePdf"
 
 const ContractForm = () => {
 
@@ -21,22 +20,6 @@ const ContractForm = () => {
   const [loadingData, setLoadingData] = useState(null);
 
 
-  const downloadPDF = async (values) => {
-    try {
-      const blob = await generatePDFBlob(values);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${values.firstName}_contract.pdf`; // Adjust the file name as needed
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      // Handle error if PDF generation fails
-    }
-  };
 
   return (
     <>
@@ -74,22 +57,23 @@ const ContractForm = () => {
             setSubmitting(true);
             // check pad signature
             setModalVisible(true);
-            if (sigPad.current && sigPad.current.isEmpty()) {
-              toast.error("Signature is required");
-              setSubmitting(false);
-              return;
-            }
 
+            let signatureBlob;
             if (sigPad.current && !sigPad.current.isEmpty()) {
               // prepare signature 
-              const signatureBlob = await new Promise((resolve) =>
+              signatureBlob = await new Promise((resolve) =>
                 sigPad.current.getTrimmedCanvas().toBlob((blob) => resolve(blob), "image/png")
               );
-              const signatureData = sigPad.current.toDataURL("image/png");
+
               if (signatureBlob) {
-                values.signature = signatureData;
+                values.signature = sigPad.current.toDataURL("image/png");;
+              } else {
+                toast.error("Signature is required");
+                setSubmitting(false);
+                return;
               }
             }
+
 
             // Prepare filesInfo
             const filesInfo = {
@@ -106,16 +90,19 @@ const ContractForm = () => {
               // Save form data and files
               const savedData = await saveFormDataWithFiles(values, filesInfo);
               console.log("Form submitted successfully:", savedData.id);
-              // donwload pdf
+
+              // Define a function to update upload statuses
+              if (savedData) {
+                downloadPDF(values); // Only download PDF if form is successfully saved
+              } else {
+                throw new Error('Failed to save form data.');
+              }
               setLoadingData(savedData);
             } catch (error) {
               console.error("Error: ", error);
               toast.error("An error occurred. Please try again.");
             } finally {
               //reset and dw
-              downloadPDF(values);
-              // sendEmail(values)
-              // toast.success("Form submitted successfully!");
               setSubmitting(false);
               resetForm();
               sigPad.current.clear();

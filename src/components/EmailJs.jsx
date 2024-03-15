@@ -2,11 +2,11 @@
 
 
 import emailjs from 'emailjs-com';
-import { toast } from 'react-toastify';
+
 
 export const sendEmail = async (values, fileUrls) => {
   if (!values.email) {
-    toast.error("Email address is required.");
+
     return;
   }
 
@@ -28,22 +28,17 @@ export const sendEmail = async (values, fileUrls) => {
     const emailParams = {
       ...templateParams,
       ...{
-        message_html: `
-          Nume: ${values.firstName}
-          Prenume: ${values.lastName}
-          Telefon: ${values.phone}
-          Email: ${values.email}
-          download:${fileUrls};
-         
-        `,
-        download_link: ` Contract:<a href="${fileUrls}">Download File</a><br>;`
+        // message_html: `
+        //  ${values.firstName} ${values.lastName}
+        // `,
+        download_link: `${fileUrls}`
       }
     };
 
     await emailjs.send(serviceId, templateId, emailParams, userId);
-    toast.success("Email sent successfully!");
+    console.log("Email sent successfully!", values.email);
   } catch (error) {
     console.error("Error sending email: ", error);
-    toast.error("Error sending email");
+
   }
 };

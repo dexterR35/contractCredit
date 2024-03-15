@@ -4,9 +4,13 @@ import { doc, setDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import generatePDFBlob from "../components/GeneratePdf";
 import {sendEmail} from "../components/EmailJs"
+
 export const saveFormDataWithFiles = async (formData, filesInfo) => {
+  
   const docRef = doc(collection(db, "contracts"));
+  
   try {
+    
     // Generate PDF blob
     const pdfBlob = await generatePDFBlob(formData);
     // Upload PDF to Firebase Storage
@@ -29,7 +33,7 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
         const snapshot = await uploadBytes(fileRef, fileDetails.file);
         const fileUrl = await getDownloadURL(snapshot.ref);
         updates[fieldName] = fileUrl;
-        
+     
         console.log(`${fieldName} uploaded successfully:`, fileUrl);
       }
     }
