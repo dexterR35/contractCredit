@@ -7,8 +7,8 @@ import { toast, ToastContainer } from "react-toastify";
 import { saveFormDataWithFiles } from "../../services/FirebaseServices";
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
 import { downloadPDF } from "../contractForm/DwPdf"
-const ModalPopup = React.lazy(() => import('../ModalPopup'));
-
+// const ModalPopup = React.lazy(() => import('../ModalPopup'));
+import ModalPopup from "../ModalPopup";
 import InfoCredit from "../InfoCredit";
 import TextCredit from "../TextCredit";
 
