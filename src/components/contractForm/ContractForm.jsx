@@ -8,8 +8,9 @@ import { saveFormDataWithFiles } from "../../services/FirebaseServices";
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
 import { downloadPDF } from "../contractForm/DwPdf"
 const ModalPopup = React.lazy(() => import('../ModalPopup'));
-const InfoCredit = React.lazy(() => import('../InfoCredit'));
-const TextCredit = React.lazy(() => import('../TextCredit'));
+
+import InfoCredit from "../InfoCredit";
+import TextCredit from "../TextCredit";
 
 const ContractForm = () => {
 
