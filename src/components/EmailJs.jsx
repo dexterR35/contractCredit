@@ -12,7 +12,7 @@ export const sendEmail = async (values, fileUrls) => {
 
   try {
     const templateParams = {
-      from_name: "ObtineCredit.ro",
+      from_name: "Obtinecredit.ro",
       to_name: `${values.firstName} ${values.lastName}`,
       reply_to: values.email,
     };
@@ -21,9 +21,9 @@ export const sendEmail = async (values, fileUrls) => {
     const templateId = import.meta.env.VITE_REACT_APP_EMAIL_templateId; // Update with your EmailJS template ID
     const userId = import.meta.env.VITE_REACT_APP_EMAIL_userId
 
-    console.log('Service ID:', serviceId);
-    console.log('Template ID:', templateId);
-    console.log('User ID:', userId);
+    console.log('Service ID:', "Done");
+    console.log('Template ID:', "Done");
+    console.log('User ID:', "Done");
 
     const emailParams = {
       ...templateParams,

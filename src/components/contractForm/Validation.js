@@ -13,32 +13,32 @@ export const validateForm = (values,sigPad) => {
         errors.firstName = "Introdu Numele";
     }
     if (!values.lastName) {
-        errors.lastName = "Last name is required";
+        errors.lastName = "Introdu Prenumele";
     }
     if (!values.phone) {
-        errors.phone = "Phone is required";
+        errors.phone = "Introdu numărul de telefon";
     } else if (!/^[0-9]+$/.test(values.phone)) {
-        errors.phone = "Phone number is not valid";
+        errors.phone = "Numărul de telefon nu este valid";
     }
     if (!values.email) {
         errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-        errors.email = "Invalid email address";
+        errors.email = "Adresa de email nu este validă";
     }
     if (!values.photo) {
-        errors.photo = "Photo is required";
+        errors.photo = "Adaugă poza cu buletinul";
     } else {
         // Check if the file type is one of the allowed types
-        if (!["image/png", "image/jpg", "image/jpeg", "image/gif", "image/webp"].includes(values.photo.type)) {
-            errors.photo = "Invalid file type. Only PNG, JPG, GIF, and WEBP are allowed.";
+        if (!["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(values.photo.type)) {
+            errors.photo = "Fisier invalid. Selectează un fisier valid (png/webp/jpg/";
         }
         // Check if the file size is greater than 12 MB
         else if (values.photo.size >= 12582912) {
-            errors.photo = "File size must be less than 12MB";
+            errors.photo = "Fisierul trebuie sa contină până in 12mb";
         }
     }
     if (!sigPad || (sigPad.current && sigPad.current.isEmpty())) {
-        errors.signature = "Signature is required";
+        errors.signature = "Semnătura este obligatorie";
     }
 
     return errors;

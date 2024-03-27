@@ -22,7 +22,7 @@ const generatePDFBlob = async (values) => {
   display:flex;justify-content:center;flex-direction:row;align-items:center;
 }
 h2 {
-  font-size:1.4em;
+  font-size:1.3em;
   font-weight:700;
   text-align:center;
   width:100%;
@@ -30,14 +30,31 @@ h2 {
 .pdf-container {
   font-family: sans-serif;
 }
+.pdf-container > div {
+  page-break-inside: avoid;
+}
+.pdf-container > div  {
+  margin:20px 0;
+}
+
+.pdf-container ul {
+  // padding-left: 20px; /* Adjust list indentation */
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+.pdf-container li {
+  font-size: 0.9em; /* Adjust font size */
+  margin-bottom: 0mm; /* Adjust space between list items */
+  text-align: justify; /* Justify text for better alignment */
+  line-height: 1.2; /* Adjust line spacing */
+  // word-break: break-word; /* Ensure long words do not overflow */
+}
 </style>
 
 
   <div class="pdf-container">
     <h2>Contract de Prestari Servicii</h2>
-    <br/>
     ${textCredit}
-    <br/>
     <div class="container_bottom">
       <div class="name_container"><span>Nume:</span> <span>${values.firstName} ${values.lastName}</span> <br> Data: ${currentDate()}</div>
       <div class="signature_container"><span>Semnatura:</span> <br> <img src="${values.signature}" alt="signature" style="width:150px;height:auto;"/></div>
@@ -59,10 +76,12 @@ h2 {
 
   try {
     const options = {
-      margin: [20, 15, 30, 15], // in mm
+      margin: [10, 15, 10, 15], // in mm
       filename: 'document.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
+      image: { type: 'jpeg', quality: 0.98 }, // in quality
+      html2canvas: { scale: 1 },// 1 = 1.2mb  2 = 5mb
+      precision: true,
+      // compress: true,
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 

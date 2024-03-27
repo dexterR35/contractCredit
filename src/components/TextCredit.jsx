@@ -6,10 +6,10 @@ const TextCredit = () => {
         <div>
             {contractSections.map((section, index) => (
                 <div key={index}>
-                    <p className="my-4"><b>{section.title}</b></p>
+                    <p className="my-2"><b>{section.title}</b></p>
                     <ul>
                         {section.items.map((item, itemIndex) => (
-                            <li key={itemIndex} className="my-1">{item}</li>
+                            <li key={itemIndex}>{item}</li>
                         ))}
                     </ul>
                 </div>

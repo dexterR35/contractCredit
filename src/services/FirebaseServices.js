@@ -1,6 +1,6 @@
 
 import { db, storage } from "./FirebaseConfig";
-import { doc, setDoc, collection } from "firebase/firestore";
+import { doc, setDoc, collection,serverTimestamp} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import generatePDFBlob from "../components/GeneratePdf";
 import {sendEmail} from "../components/EmailJs"
@@ -39,7 +39,7 @@ export const saveFormDataWithFiles = async (formData, filesInfo) => {
     }
      
     // Save form data along with PDF URL and other file URLs to Firestore
-    const data = { ...formData, pdfUrl, ...updates };
+    const data = { ...formData, pdfUrl, ...updates, timeStamp: serverTimestamp() };
     // Save the merged data to the Firestore document
     await setDoc(docRef, data);
     await sendEmail(formData, pdfUrl, updates); 
