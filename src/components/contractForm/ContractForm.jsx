@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import SignaturePad from "react-signature-canvas";
 import { FcAddImage } from "react-icons/fc";
@@ -7,9 +7,9 @@ import { toast, ToastContainer } from "react-toastify";
 import { saveFormDataWithFiles } from "../../services/FirebaseServices";
 import { currentDate, validateForm, checkFormFields } from "../contractForm/Validation";
 import { downloadPDF } from "../contractForm/DwPdf"
-import ModalPopup from "../ModalPopup";
-import InfoCredit from "../InfoCredit";
-import TextCredit from "../TextCredit";
+const ModalPopup = React.lazy(() => import('../ModalPopup'));
+const InfoCredit = React.lazy(() => import('../InfoCredit'));
+const TextCredit = React.lazy(() => import('../TextCredit'));
 
 const ContractForm = () => {
 
