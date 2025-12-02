@@ -1,11 +1,12 @@
 
 import ReactDOMServer from "react-dom/server";
-import html2pdf from "html2pdf.js";
 import TextCredit from "./TextCredit";
 import { currentDate } from "./contractForm/Validation"
 
 
 const generatePDFBlob = async (values) => {
+  // Dynamically import html2pdf.js only when needed
+  const html2pdf = (await import("html2pdf.js")).default;
   const content = document.createElement("div");
   const textCredit = ReactDOMServer.renderToString(<TextCredit />);
   let htmlContent = `
