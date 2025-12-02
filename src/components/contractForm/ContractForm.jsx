@@ -227,7 +227,7 @@ const ContractForm = () => {
                     </div>
                     {/* date and name */}
                     <div className="flex flex-col mt-12">
-                      <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {values.firstName || values.lastName ? `${values.firstName} ${values.lastName}` : " Marian Iordache "}</p>
+                      <p className="mb-2 text-lg"><span className="text-[16px]">Numele Clientului:</span> {values.firstName || values.lastName ? `${values.firstName} ${values.lastName}`.trim() : ""}</p>
                       <p className="text-lg"><span className="text-[16px]">Data:</span> {currentDate()}</p>
                     </div>
                   </div>

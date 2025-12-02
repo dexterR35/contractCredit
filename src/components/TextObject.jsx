@@ -2,7 +2,7 @@ export const contractSections = [
     {
         title: "",
         items: [
-            "SOCIETATEA OBTINECREDIT.RO SRL, cu sediul social în Bucureşti, SECTOR 1, Str. Hrisovului Nr. 5A, CAMERA 1, Bloc. 2, Scara 1, Etaj 4, nr. telefon 0786.744.694, înregistrată în Registrul Comerţului sub nr. J40/11953/2023, și CIF 48406675, Cont RO85RNCB0082175670920001 deschis la Banca Comerciala Roaman S.A., reprezentată legal de către Dl. Hodor Florin, în calitate de consultant financiar."
+            ""
         ]
     },
     {
@@ -20,7 +20,7 @@ export const contractSections = [
     {
         title: "ART. 3. REMUNERAŢIA CUVENITĂ",
         items: [
-            "(1) Prestatorul este îndreptăţit să primească o remuneraţie, care constă în contravaloarea serviciilor oferite de Prestator, în scopul realizării obiectului Contractului și (b) 15% din valoarea oricărui produs financiar-bancar aprobat de instituția financiar-bancară și acordat Clientului prin intermediul serviciilor oferite de Prestator în temeiul prezentului Contract, cu titlu de remunerație de succes.",
+            "(1) Prestatorul este îndreptăţit să primească o remuneraţie, care constă în contravaloarea serviciilor oferite de Prestator, în scopul realizării obiectului Contractului și (b) 13% din valoarea oricărui produs financiar-bancar aprobat de instituția financiar-bancară și acordat Clientului prin intermediul serviciilor oferite de Prestator în temeiul prezentului Contract, cu titlu de remunerație de succes.",
             "(2) Dovada obținerii produsului financiar-bancar pentru care s-au oferit servicii în temeiul prezentului Contract se va face prin prezentarea de către Client a situației sale din Biroul de Credite S.A. sau cu orice alt mijloc de probă.",
             "(3) Remunerația cuvenită Prestatorului potrivit alin. (1) lit. a), b), și c) a acestui articol va fi achitată integral de către Client în urma obținerii produsului financiar-bancar, în termen de 10 zile de la data emiterii facturii aferente acesteia remunerația de succes cuvenită Prestatorului potrivit alin. (1) lit. b) și c) va fi achitată integral de către Client în termen de 14 de zile de la data obținerii produsului financiar-bancar."
         ]
@@ -84,7 +84,7 @@ export const contractSections = [
             "(3) Dovada cazului de forță majoră se face în baza constatării autorității competente.",
             "(4) Îndeplinirea obligațiilor contractuale va fi suspendată pe toată perioada de acţiune a forţei majore, dar fără a prejudicia drepturile ce li se cuveneau Părţilor până la apariţia acesteia.",
             "(5) Dacă forţa majoră acţionează sau se estimează că va acţiona pe o perioadă mai mare de 28 de zile, prezentul Contract încetează de plin drept, fără ca vreuna dintre Părţi să poată pretinde celeilalte daune-interese.",
-            "Prezentul Contract a fost semnat astăzi, _______, la Bucuresti, în 2 (două) exemplare originale, ambele având aceeași valoare juridică, din care 1 (unul) pentru Prestator și 1 (unul) pentru Client.",
+            "Prezentul Contract a fost semnat astăzi, în 2 (două) exemplare originale, ambele având aceeași valoare juridică, din care 1 (unul) pentru Prestator și 1 (unul) pentru Client.",
         ]
 
     },

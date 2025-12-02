@@ -56,7 +56,7 @@ h2 {
     <h2>Contract de Prestari Servicii</h2>
     ${textCredit}
     <div class="container_bottom">
-      <div class="name_container"><span>Nume:</span> <span>${values.firstName} ${values.lastName}</span> <br> Data: ${currentDate()}</div>
+      <div class="name_container">${values.firstName || values.lastName ? `<span>Nume:</span> <span>${values.firstName} ${values.lastName}</span> <br>` : ''} Data: ${currentDate()}</div>
       <div class="signature_container"><span>Semnatura:</span> <br> <img src="${values.signature}" alt="signature" style="width:150px;height:auto;"/></div>
     </div>
   </div>
